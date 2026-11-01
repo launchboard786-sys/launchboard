@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { ListingForm } from "@/components/ListingForm";
 import { PageHeader } from "@/components/PageHeader";
-import { config } from "@/lib/config";
+import { config, uploadsEnabled } from "@/lib/config";
 import { requireUserOrRedirect } from "@/lib/guards";
 import { needsVerification } from "@/lib/auth";
 import { VerifyBanner } from "@/components/AccountForms";
@@ -23,7 +23,7 @@ export default async function NewListing() {
             : `The free spots are taken. A one-time listing fee of ${formatINR(config.listingFeePaise)} applies, paid after you submit. We review every listing, usually within a day.`}
       </>} />
       {needsVerification(user) && <VerifyBanner email={user.email} />}
-      <ListingForm categories={cats.map((c) => ({ id: c.id, name: c.name }))} />
+      <ListingForm uploads={uploadsEnabled()} categories={cats.map((c) => ({ id: c.id, name: c.name }))} />
     </div>
   );
 }

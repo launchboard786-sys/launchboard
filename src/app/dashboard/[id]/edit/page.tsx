@@ -3,6 +3,7 @@ import { ListingForm } from "@/components/ListingForm";
 import { PageHeader } from "@/components/PageHeader";
 import { orNotFound, requireUserOrRedirect } from "@/lib/guards";
 import { getOwnedBusiness, listCategories } from "@/lib/listings";
+import { uploadsEnabled } from "@/lib/config";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = { title: "Edit listing" };
@@ -15,6 +16,7 @@ export default async function EditListing({ params }: { params: Promise<{ id: st
     <div className="wrap flex max-w-3xl flex-col gap-6 pt-10">
       <PageHeader size="md" kicker="Edit listing" title={b.name} />
       <ListingForm
+        uploads={uploadsEnabled()}
         categories={cats.map((c) => ({ id: c.id, name: c.name }))}
         initial={{ ...b, logoUrl: b.logoUrl ?? "" }}
       />

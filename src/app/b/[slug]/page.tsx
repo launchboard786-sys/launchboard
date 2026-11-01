@@ -5,6 +5,7 @@ import { and, eq } from "drizzle-orm";
 import { db } from "@/db";
 import { placements, votes } from "@/db/schema";
 import { Logo } from "@/components/Logo";
+import { Gallery } from "@/components/Gallery";
 import { STAGE_LABEL, StatusChip } from "@/components/Badges";
 import { Crown } from "@/components/Crown";
 import { Magnetic } from "@/components/motion/Magnetic";
@@ -115,6 +116,13 @@ export default async function BusinessPage({ params, searchParams }: Props) {
             </StaggerItem>
           ))}
         </Stagger>
+
+        {b.screenshotUrls.length > 0 && (
+          <Reveal as="section" className="mt-12">
+            <h2 className="kicker mb-4">Product</h2>
+            <Gallery name={b.name} urls={b.screenshotUrls} />
+          </Reveal>
+        )}
 
         <Reveal as="section" className="mt-12 grid gap-10 md:grid-cols-[1fr_15rem]">
           <div>
