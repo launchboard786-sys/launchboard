@@ -11,6 +11,9 @@ import { Stagger, StaggerItem } from "@/components/motion/Reveal";
 import { StatusChip, ZoneChip } from "@/components/Badges";
 import { ensureSettled, getPlacementsForBusinesses } from "@/lib/auction";
 import { requireUserOrRedirect } from "@/lib/guards";
+import { needsVerification } from "@/lib/auth";
+import { VerifyBanner } from "@/components/AccountForms";
+import { Notice } from "@/components/Notice";
 import { formatINR } from "@/lib/money";
 import { statsTotalsFor } from "@/lib/stats";
 import { currentWeek } from "@/lib/week";
@@ -18,7 +21,8 @@ import { currentWeek } from "@/lib/week";
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = { title: "Dashboard" };
 
-export default async function Dashboard() {
+export default async function Dashboard({ searchParams }: { searchParams: Promise<{ reset?: string }> }) {
+  const { reset } = await searchParams;
   const user = await requireUserOrRedirect("/dashboard");
   await ensureSettled();
   const rows = await db
@@ -34,6 +38,12 @@ export default async function Dashboard() {
 
   return (
     <div className="wrap flex flex-col gap-10 pt-12">
+      {(reset || needsVerification(user)) && (
+        <div className="-mb-4 flex flex-col gap-3">
+          {reset && <Notice message="Password changed. You're signed in, and other devices have been signed out." />}
+          {needsVerification(user) && <VerifyBanner email={user.email} />}
+        </div>
+      )}
       <div className="flex flex-wrap items-end justify-between gap-4">
         <PageHeader size="md" kicker={`Hi ${user.name.split(" ")[0]}`} title="Your businesses" />
         <Magnetic><Link prefetch={false} href="/dashboard/new" className="btn-primary rounded-full px-5 py-2.5">+ Add a business</Link></Magnetic>

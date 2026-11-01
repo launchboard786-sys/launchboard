@@ -6,6 +6,8 @@ import { conflict } from "@/lib/errors";
 import { clientKey, parseJson, route } from "@/lib/http";
 import { rateLimit } from "@/lib/rate-limit";
 import { signupSchema } from "@/lib/validation";
+import { emailEnabled } from "@/lib/config";
+import { sendVerificationEmail } from "@/lib/tokens";
 
 export const POST = route(async (req) => {
   rateLimit(`signup:${clientKey(req)}`, 10, 60 * 60_000);
@@ -17,6 +19,7 @@ export const POST = route(async (req) => {
     .onConflictDoNothing({ target: users.email })
     .returning({ id: users.id });
   if (!inserted[0]) throw conflict("An account with this email already exists. Try logging in.", "EMAIL_TAKEN");
+  if (emailEnabled()) await sendVerificationEmail({ id: inserted[0].id, email: input.email, name: input.name });
   const res = NextResponse.json({ ok: true }, { status: 201 });
   res.cookies.set(SESSION_COOKIE, await signSession(inserted[0].id), sessionCookieOptions());
   return res;
