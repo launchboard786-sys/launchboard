@@ -1,0 +1,1 @@
+ALTER TABLE "businesses" ADD COLUMN "screenshot_urls" text[] DEFAULT '{}'::text[] NOT NULL;
