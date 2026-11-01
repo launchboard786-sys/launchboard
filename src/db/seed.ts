@@ -125,18 +125,18 @@ function rng(seed: number) {
 async function main() {
   const rand = rng(42);
   console.log("Resetting tables…");
-  await db.execute(sql`truncate table users, categories, businesses, votes, wallets, ledger_entries, bids, settlements, placements, payments, daily_stats cascade`);
+  await db.execute(sql`truncate table auth_tokens, users, categories, businesses, votes, wallets, ledger_entries, bids, settlements, placements, payments, daily_stats cascade`);
 
-  const [admin] = await db.insert(users).values({ email: "admin@launchboard.dev", name: "Admin", passwordHash: await hashPassword("admin12345"), role: "ADMIN" }).returning();
-  const [founder] = await db.insert(users).values({ email: "founder@launchboard.dev", name: "Demo Founder", passwordHash: await hashPassword("founder12345") }).returning();
+  const [admin] = await db.insert(users).values({ email: "admin@launchboard.dev", name: "Admin", passwordHash: await hashPassword("admin12345"), role: "ADMIN", emailVerifiedAt: new Date() }).returning();
+  const [founder] = await db.insert(users).values({ email: "founder@launchboard.dev", name: "Demo Founder", passwordHash: await hashPassword("founder12345"), emailVerifiedAt: new Date() }).returning();
   const voterHash = await hashPassword("voter12345");
   const voters = await db
     .insert(users)
-    .values(Array.from({ length: 80 }, (_, i) => ({ email: `voter${i + 1}@launchboard.dev`, name: `Voter ${i + 1}`, passwordHash: voterHash })))
+    .values(Array.from({ length: 80 }, (_, i) => ({ email: `voter${i + 1}@launchboard.dev`, name: `Voter ${i + 1}`, passwordHash: voterHash, emailVerifiedAt: new Date() })))
     .returning();
   const owners = await db
     .insert(users)
-    .values(Array.from({ length: 30 }, (_, i) => ({ email: `owner${i + 1}@launchboard.dev`, name: `Owner ${i + 1}`, passwordHash: voterHash })))
+    .values(Array.from({ length: 30 }, (_, i) => ({ email: `owner${i + 1}@launchboard.dev`, name: `Owner ${i + 1}`, passwordHash: voterHash, emailVerifiedAt: new Date() })))
     .returning();
   console.log(`Users: admin, founder, ${voters.length} voters, ${owners.length} owners`);
 

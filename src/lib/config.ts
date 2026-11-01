@@ -52,7 +52,28 @@ export const config = {
     webhookSecret: process.env.STRIPE_WEBHOOK_SECRET || "",
   },
   cronSecret: process.env.CRON_SECRET || "",
+
+  email: {
+    /** Resend (resend.com) API key. Without it (and without a dev outbox) no email is sent. */
+    resendKey: process.env.RESEND_API_KEY || "",
+    from: process.env.EMAIL_FROM || "REIGN <onboarding@resend.dev>",
+    /** Development/tests only: write emails as JSON files to this folder instead of sending. */
+    devOutbox: process.env.EMAIL_DEV_OUTBOX || "",
+  },
 };
+
+/** Email can actually reach people (or the dev outbox). */
+export function emailEnabled() {
+  return Boolean(config.email.resendKey || config.email.devOutbox);
+}
+
+/**
+ * Verified email is required to vote and to list a business, but only once email
+ * sending is set up; otherwise nobody could ever verify. EMAIL_VERIFICATION=off disables it.
+ */
+export function verificationRequired() {
+  return emailEnabled() && process.env.EMAIL_VERIFICATION !== "off";
+}
 
 export type ZoneKey = (typeof config.zones)[number]["key"];
 

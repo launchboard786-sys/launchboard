@@ -45,8 +45,31 @@ export const users = pgTable("users", {
   name: text("name").notNull(),
   passwordHash: text("password_hash").notNull(),
   role: roleEnum("role").notNull().default("USER"),
+  /** Set when the user clicks the link in their verification email. */
+  emailVerifiedAt: timestamp("email_verified_at", { withTimezone: true }),
+  /** Sessions issued before this moment are rejected (logs out other devices after a reset). */
+  passwordChangedAt: timestamp("password_changed_at", { withTimezone: true }),
   createdAt: createdAt(),
 });
+
+export const tokenPurposeEnum = pgEnum("token_purpose", ["VERIFY_EMAIL", "RESET_PASSWORD"]);
+
+/** One-time links sent by email. Only a SHA-256 hash of the token is stored. */
+export const authTokens = pgTable(
+  "auth_tokens",
+  {
+    id: id(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    purpose: tokenPurposeEnum("purpose").notNull(),
+    tokenHash: text("token_hash").notNull().unique(),
+    expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+    usedAt: timestamp("used_at", { withTimezone: true }),
+    createdAt: createdAt(),
+  },
+  (t) => [index("auth_tokens_user_idx").on(t.userId, t.purpose)],
+);
 
 export const categories = pgTable("categories", {
   id: id(),

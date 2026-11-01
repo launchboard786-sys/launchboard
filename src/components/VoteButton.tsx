@@ -37,6 +37,10 @@ export function VoteButton({ businessId, count, voted: initial, compact = false 
           router.push(`/login?next=${encodeURIComponent(window.location.pathname)}`);
           return;
         }
+        if (e instanceof ApiError && e.code === "EMAIL_UNVERIFIED") {
+          toast({ tone: "info", title: "Confirm your email to upvote", description: e.message });
+          return;
+        }
         toast({ tone: "error", title: "Couldn't record your vote", description: e instanceof Error ? e.message : undefined });
       }
     });

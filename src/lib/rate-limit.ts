@@ -6,14 +6,14 @@ import { tooMany } from "./errors";
  */
 const buckets = new Map<string, { count: number; resetAt: number }>();
 
-export function rateLimit(key: string, limit: number, windowMs: number, now = Date.now()) {
+export function rateLimit(key: string, limit: number, windowMs: number, now = Date.now(), message?: string) {
   const b = buckets.get(key);
   if (!b || b.resetAt <= now) {
     buckets.set(key, { count: 1, resetAt: now + windowMs });
     return;
   }
   b.count++;
-  if (b.count > limit) throw tooMany();
+  if (b.count > limit) throw tooMany(message);
 }
 
 /** Occasionally drop expired buckets so memory doesn't grow forever. */

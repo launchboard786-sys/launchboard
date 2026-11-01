@@ -5,7 +5,8 @@ import { cache } from "react";
 import { eq } from "drizzle-orm";
 import { db } from "@/db";
 import { users, type User } from "@/db/schema";
-import { forbidden, unauthorized } from "./errors";
+import { verificationRequired } from "./config";
+import { AppError, forbidden, unauthorized } from "./errors";
 
 export const SESSION_COOKIE = "lb_session";
 const SESSION_DAYS = 30;
@@ -31,14 +32,19 @@ export async function signSession(userId: string) {
     .sign(secret());
 }
 
-export async function readSession(token: string | undefined): Promise<string | null> {
+export async function readSession(token: string | undefined): Promise<{ userId: string; issuedAt: number } | null> {
   if (!token) return null;
   try {
     const { payload } = await jwtVerify(token, secret(), { algorithms: ["HS256"] });
-    return typeof payload.sub === "string" ? payload.sub : null;
+    return typeof payload.sub === "string" ? { userId: payload.sub, issuedAt: payload.iat ?? 0 } : null;
   } catch {
     return null;
   }
+}
+
+/** Sessions created before the last password change are no longer valid (seconds precision, like JWT iat). */
+export function sessionStillValid(issuedAt: number, passwordChangedAt: Date | null) {
+  return !passwordChangedAt || issuedAt >= Math.floor(passwordChangedAt.getTime() / 1000);
 }
 
 export function sessionCookieOptions() {
@@ -64,11 +70,23 @@ export function toSafeUser(u: User): SafeUser {
  */
 export const getCurrentUser = cache(async function getCurrentUser(): Promise<SafeUser | null> {
   const jar = await cookies();
-  const userId = await readSession(jar.get(SESSION_COOKIE)?.value);
-  if (!userId) return null;
-  const [u] = await db.select().from(users).where(eq(users.id, userId));
-  return u ? toSafeUser(u) : null;
+  const session = await readSession(jar.get(SESSION_COOKIE)?.value);
+  if (!session) return null;
+  const [u] = await db.select().from(users).where(eq(users.id, session.userId));
+  if (!u || !sessionStillValid(session.issuedAt, u.passwordChangedAt)) return null;
+  return toSafeUser(u);
 });
+
+/** Whether this user still has to confirm their email before voting or listing. */
+export function needsVerification(u: Pick<SafeUser, "emailVerifiedAt">) {
+  return verificationRequired() && !u.emailVerifiedAt;
+}
+
+export function requireVerified(u: SafeUser) {
+  if (needsVerification(u)) {
+    throw new AppError(403, "EMAIL_UNVERIFIED", `Please confirm your email first. We sent a link to ${u.email}.`);
+  }
+}
 
 export async function requireUser(): Promise<SafeUser> {
   const u = await getCurrentUser();
