@@ -97,6 +97,8 @@ export const businesses = pgTable(
     description: text("description").notNull(),
     websiteUrl: text("website_url").notNull(),
     logoUrl: text("logo_url"),
+    /** Up to 6 product screenshots, uploaded through /api/uploads. */
+    screenshotUrls: text("screenshot_urls").array().notNull().default(sql`'{}'::text[]`),
     location: text("location").notNull(),
     foundedYear: integer("founded_year").notNull(),
     stage: stageEnum("stage").notNull(),

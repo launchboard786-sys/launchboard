@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { config } from "./config";
+import { isOurUpload } from "./storage";
 
 const trimmed = (min: number, max: number, label: string) =>
   z
@@ -43,6 +44,13 @@ export const listingSchema = z.object({
   description: trimmed(40, 3000, "Description"),
   websiteUrl: httpUrl,
   logoUrl: z.union([httpUrl, z.literal("")]).optional().transform((v) => v || null),
+  /** Only images uploaded through /api/uploads, so listings can't hotlink or track visitors. */
+  screenshotUrls: z
+    .array(z.string().max(500))
+    .max(6, "You can add up to 6 screenshots.")
+    .refine((list) => list.every(isOurUpload), "Screenshots must be uploaded here.")
+    .transform((list) => [...new Set(list)])
+    .optional(),
   location: trimmed(2, 80, "Location"),
   foundedYear: z.coerce.number().int().min(1990, "Founded year looks too early.").max(currentYear, "Founded year can't be in the future."),
   stage: z.enum(["IDEA", "MVP", "EARLY_REVENUE", "GROWTH"]),

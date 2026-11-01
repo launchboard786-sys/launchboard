@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { api } from "@/lib/client";
+import { LogoPicker, ScreenshotPicker } from "./ImagePickers";
 
 type Cat = { id: string; name: string };
 type Initial = {
@@ -11,24 +12,33 @@ type Initial = {
   description: string;
   websiteUrl: string;
   logoUrl: string;
+  screenshotUrls?: string[];
   location: string;
   foundedYear: number;
   stage: string;
   categoryId: string;
 };
 
-export function ListingForm({ categories, initial }: { categories: Cat[]; initial?: Initial }) {
+export function ListingForm({ categories, initial, uploads = false }: { categories: Cat[]; initial?: Initial; uploads?: boolean }) {
   const router = useRouter();
   const [err, setErr] = useState<{ message: string; field?: string } | null>(null);
   const [busy, setBusy] = useState(false);
   const [tagline, setTagline] = useState(initial?.tagline ?? "");
   const editing = !!initial?.id;
+  const [logo, setLogo] = useState(initial?.logoUrl ?? "");
+  const [shots, setShots] = useState<string[]>(initial?.screenshotUrls ?? []);
+  const [uploading, setUploading] = useState(0);
+  const onBusy = (b: boolean) => setUploading((n) => n + (b ? 1 : -1));
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setErr(null);
     setBusy(true);
-    const body = Object.fromEntries(new FormData(e.currentTarget));
+    const body: Record<string, unknown> = Object.fromEntries(new FormData(e.currentTarget));
+    if (uploads) {
+      body.logoUrl = logo;
+      body.screenshotUrls = shots;
+    }
     try {
       const r = editing
         ? await api<{ id: string; sentToReview: boolean }>(`/api/businesses/${initial!.id}`, body, "PATCH")
@@ -78,10 +88,12 @@ export function ListingForm({ categories, initial }: { categories: Cat[]; initia
           <label className="label" htmlFor="websiteUrl">Website</label>
           <input className="input" id="websiteUrl" name="websiteUrl" type="url" defaultValue={initial?.websiteUrl} required placeholder="https://" />
         </div>
-        <div>
-          <label className="label" htmlFor="logoUrl">Logo URL <span className="font-normal text-muted">(optional)</span></label>
-          <input className="input" id="logoUrl" name="logoUrl" type="url" defaultValue={initial?.logoUrl} placeholder="https://…/logo.png" />
-        </div>
+        {!uploads && (
+          <div>
+            <label className="label" htmlFor="logoUrl">Logo URL <span className="font-normal text-muted">(optional)</span></label>
+            <input className="input" id="logoUrl" name="logoUrl" type="url" defaultValue={initial?.logoUrl} placeholder="https://…/logo.png" />
+          </div>
+        )}
         <div>
           <label className="label" htmlFor="location">City</label>
           <input className="input" id="location" name="location" defaultValue={initial?.location} required placeholder="Bangalore" />
@@ -91,11 +103,17 @@ export function ListingForm({ categories, initial }: { categories: Cat[]; initia
           <input className="input" id="foundedYear" name="foundedYear" type="number" min={1990} max={year} defaultValue={initial?.foundedYear ?? year} required />
         </div>
       </div>
+      {uploads && (
+        <div className="flex flex-col gap-6 border-t border-line pt-6">
+          <LogoPicker value={logo} onChange={setLogo} onBusy={onBusy} />
+          <ScreenshotPicker value={shots} onChange={setShots} onBusy={onBusy} />
+        </div>
+      )}
       {editing && <p className="text-sm text-muted">Changing the name or website sends a live listing back for a quick review.</p>}
       {err && <p role="alert" key={err.message} className="animate-[reign-shake_0.4s_ease] rounded-[12px] bg-bad/10 px-3.5 py-3 text-sm text-bad">{err.message}</p>}
       <div className="flex gap-2">
-        <button className="btn-primary px-6 py-3" disabled={busy}>
-          {busy ? <span className="flex items-center gap-2"><span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-bg/30 border-t-bg" />Saving…</span> : editing ? "Save changes" : "Submit for review"}
+        <button className="btn-primary px-6 py-3" disabled={busy || uploading > 0}>
+          {uploading > 0 ? "Uploading images…" : busy ? <span className="flex items-center gap-2"><span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-bg/30 border-t-bg" />Saving…</span> : editing ? "Save changes" : "Submit for review"}
         </button>
         <button type="button" className="btn-ghost px-5 py-3" onClick={() => router.back()}>Cancel</button>
       </div>

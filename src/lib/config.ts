@@ -12,7 +12,15 @@ function int(name: string, fallback: number): number {
 
 export const config = {
   appName: process.env.NEXT_PUBLIC_APP_NAME || "REIGN",
-  appUrl: process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000",
+  /**
+   * Public address used in emails and share links. Falls back to the production
+   * address Vercel provides, so links never point at localhost on a live site.
+   */
+  appUrl: (
+    process.env.NEXT_PUBLIC_APP_URL ||
+    (process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : "") ||
+    "http://localhost:3000"
+  ).replace(/\/+$/, ""),
   currency: "INR" as const,
 
   /** Listings accepted for free before a listing fee applies. */
@@ -61,6 +69,20 @@ export const config = {
     devOutbox: process.env.EMAIL_DEV_OUTBOX || "",
   },
 };
+
+/** Image uploads: Supabase Storage in production, a local folder in development and tests. */
+export const storage = {
+  supabaseUrl: (process.env.SUPABASE_URL || "").replace(/\/+$/, ""),
+  /** Supabase → Project Settings → API Keys → secret key (or the legacy service_role key). Server only. */
+  supabaseKey: process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY || "",
+  bucket: process.env.SUPABASE_BUCKET || "uploads",
+  /** Development/tests only: keep uploads in this folder, served from /files/... */
+  localDir: process.env.UPLOADS_LOCAL_DIR || "",
+};
+
+export function uploadsEnabled() {
+  return Boolean((storage.supabaseUrl && storage.supabaseKey) || storage.localDir);
+}
 
 /** Email can actually reach people (or the dev outbox). */
 export function emailEnabled() {
