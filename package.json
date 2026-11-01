@@ -15,8 +15,6 @@
     "db:generate": "drizzle-kit generate"
   },
   "dependencies": {
-    "@fontsource-variable/geist": "^5.2.5",
-    "@fontsource-variable/geist-mono": "^5.2.5",
     "bcryptjs": "^2.4.3",
     "drizzle-orm": "0.45.4",
     "jose": "^5.9.6",
