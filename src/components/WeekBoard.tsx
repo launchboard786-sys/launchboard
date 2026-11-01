@@ -23,7 +23,7 @@ export function WeekBoard({ rows, limit = 6 }: { rows: Row[]; limit?: number }) 
         <span>Category</span><span className="text-sponsor">The throne</span><span>No. 2</span><span>No. 3</span>
       </div>
       {groups.map((g) => (
-        <StaggerItem key={g.slug} className="grid gap-x-4 gap-y-2 px-4 py-3.5 transition-colors duration-300 hover:bg-raised md:grid-cols-[11rem_1fr_1fr_1fr] md:items-center md:px-5">
+        <StaggerItem key={g.slug} className="tap-row grid gap-x-4 gap-y-2 px-4 py-3.5 transition-colors duration-300 hover:bg-raised md:grid-cols-[11rem_1fr_1fr_1fr] md:items-center md:px-5">
           <Link prefetch={false} href={`/c/${g.slug}`} className="text-sm font-semibold hover:underline hover:underline-offset-4">{g.name}</Link>
           {[1, 2, 3].map((pos) => {
             const s = g.slots.find((x) => x.position === pos);

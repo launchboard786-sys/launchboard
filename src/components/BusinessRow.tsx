@@ -22,7 +22,7 @@ export function BusinessRow({
   return (
     <StaggerItem
       as="li"
-      className={`group relative flex items-center gap-3 px-3 py-3.5 transition-colors duration-300 sm:gap-4 sm:px-5 ${
+      className={`tap-row group relative flex items-center gap-3 px-3 py-3.5 transition-colors duration-300 sm:gap-4 sm:px-5 ${
         sponsored ? "bg-gradient-to-r from-sponsor-soft/80 to-sponsor-soft/20" : "hover:bg-raised"
       }`}
     >

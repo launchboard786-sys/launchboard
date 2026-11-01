@@ -214,7 +214,7 @@ function ThroneCard({ thrones }: { thrones: Throne[] }) {
                 >
                   <Link prefetch={false}
                     href={`/b/${r.slug}${throne.sponsored ? "?s=1" : ""}`}
-                    className={`group flex items-center gap-3 rounded-2xl border px-3 py-2.5 transition-colors ${
+                    className={`tap-card group flex items-center gap-3 rounded-2xl border px-3 py-2.5 transition-colors ${
                       r.position === 1
                         ? "border-gold-hi/40 bg-gradient-to-r from-gold-hi/[0.16] to-transparent"
                         : "border-white/[0.06] bg-white/[0.025] hover:bg-white/[0.06]"

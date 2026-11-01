@@ -10,7 +10,7 @@ export function FeaturedCard({ business, position, categoryName }: { business: B
     <Tilt max={8} glow={first ? "232 186 92" : "255 255 255"} className="h-full rounded-[16px]">
       <Link prefetch={false}
         href={`/b/${business.slug}?s=1`}
-        className={`group relative flex h-full min-w-0 flex-col gap-3 overflow-hidden rounded-[16px] border p-4 transition-shadow duration-300 ${
+        className={`tap-card group relative flex h-full min-w-0 flex-col gap-3 overflow-hidden rounded-[16px] border p-4 transition-shadow duration-300 ${
           first
             ? "border-sponsor/40 bg-gradient-to-b from-sponsor-soft to-surface shadow-[0_18px_40px_-20px_rgb(var(--sponsor)/0.6)]"
             : "border-line bg-surface hover:shadow-[0_18px_40px_-22px_rgb(var(--shadow)/0.45)]"

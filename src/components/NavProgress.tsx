@@ -44,9 +44,13 @@ export function NavProgress() {
       const f = e.target as HTMLFormElement;
       if (!e.defaultPrevented && f.method.toLowerCase() === "get" && f.getAttribute("action")) start();
     };
+    // iOS Safari only shows :active (press) styles when a touchstart listener exists.
+    const noop = () => {};
+    document.addEventListener("touchstart", noop, { passive: true });
     document.addEventListener("click", onClick, true);
     document.addEventListener("submit", onSubmit);
     return () => {
+      document.removeEventListener("touchstart", noop);
       document.removeEventListener("click", onClick, true);
       document.removeEventListener("submit", onSubmit);
     };
