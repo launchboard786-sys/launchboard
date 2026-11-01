@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { CategoryForm } from "@/components/AdminActions";
+import { PageHeader } from "@/components/PageHeader";
 import { requireAdminOrRedirect } from "@/lib/guards";
 import { listCategories } from "@/lib/listings";
 
@@ -13,7 +14,7 @@ export default async function AdminCategories() {
   return (
     <div className="wrap flex flex-col gap-6 pt-10">
       <nav className="text-sm text-muted"><Link href="/admin" className="hover:text-ink">Admin</Link> / Categories</nav>
-      <h1 className="font-display text-3xl font-semibold tracking-tight">Categories</h1>
+      <PageHeader size="md" kicker="Admin" title="Categories" />
       <section className="card flex flex-col gap-3 p-6">
         <h2 className="font-display text-lg font-bold">Add category</h2>
         <CategoryForm />

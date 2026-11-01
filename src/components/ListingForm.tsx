@@ -44,7 +44,7 @@ export function ListingForm({ categories, initial }: { categories: Cat[]; initia
 
   const year = new Date().getFullYear();
   return (
-    <form onSubmit={onSubmit} className="card flex flex-col gap-5 p-6">
+    <form onSubmit={onSubmit} className="card flex flex-col gap-6 p-6 sm:p-8">
       <div className="grid gap-5 sm:grid-cols-2">
         <div className="sm:col-span-2">
           <label className="label" htmlFor="name">Business name</label>
@@ -92,10 +92,12 @@ export function ListingForm({ categories, initial }: { categories: Cat[]; initia
         </div>
       </div>
       {editing && <p className="text-sm text-muted">Changing the name or website sends a live listing back for a quick review.</p>}
-      {err && <p role="alert" className="rounded-lg bg-bad/10 p-3 text-sm text-bad">{err.message}</p>}
+      {err && <p role="alert" key={err.message} className="animate-[reign-shake_0.4s_ease] rounded-[12px] bg-bad/10 px-3.5 py-3 text-sm text-bad">{err.message}</p>}
       <div className="flex gap-2">
-        <button className="btn-primary px-6 py-2.5" disabled={busy}>{busy ? "Saving…" : editing ? "Save changes" : "Submit for review"}</button>
-        <button type="button" className="btn-ghost" onClick={() => router.back()}>Cancel</button>
+        <button className="btn-primary px-6 py-3" disabled={busy}>
+          {busy ? <span className="flex items-center gap-2"><span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-bg/30 border-t-bg" />Saving…</span> : editing ? "Save changes" : "Submit for review"}
+        </button>
+        <button type="button" className="btn-ghost px-5 py-3" onClick={() => router.back()}>Cancel</button>
       </div>
     </form>
   );

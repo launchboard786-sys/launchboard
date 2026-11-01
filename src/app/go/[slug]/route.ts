@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { getBusinessBySlug } from "@/lib/listings";
 import { isBot } from "@/lib/http";
 import { bump } from "@/lib/stats";
+import { config } from "@/lib/config";
 
 /** Outbound click to a business website. Counted, then redirected. `?s=1` marks a click from a sponsored slot. */
 export async function GET(req: NextRequest, { params }: { params: Promise<{ slug: string }> }) {
@@ -13,6 +14,6 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ slug
     if (req.nextUrl.searchParams.get("s") === "1") await bump([row.business.id], "sponsoredClicks");
   }
   const target = new URL(row.business.websiteUrl);
-  if (!target.searchParams.has("ref")) target.searchParams.set("ref", "launchboard");
+  if (!target.searchParams.has("ref")) target.searchParams.set("ref", config.appName.toLowerCase().replace(/[^a-z0-9]+/g, ""));
   return NextResponse.redirect(target, 302);
 }

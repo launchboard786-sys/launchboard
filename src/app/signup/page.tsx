@@ -1,19 +1,16 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { AuthForm } from "@/components/AuthForm";
+import { AuthShell } from "@/components/AuthShell";
 
-export const metadata: Metadata = { title: "Create your account" };
+export const metadata: Metadata = { title: "Sign up" };
 
 export default function Page() {
   return (
-    <div className="wrap flex max-w-md flex-col gap-6 pt-14">
-      <div>
-        <h1 className="font-display text-3xl font-semibold tracking-tight">Create your account</h1>
-        <p className="mt-1 text-muted">List your startup for free, upvote others and bid for sponsored spots.</p>
-      </div>
+    <AuthShell title="Create your account" subtitle="List your startup for free, upvote others and compete for the throne.">
       <Suspense>
         <AuthForm mode="signup" />
       </Suspense>
-    </div>
+    </AuthShell>
   );
 }

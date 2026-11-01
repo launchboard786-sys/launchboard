@@ -1,6 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { config } from "@/lib/config";
+import { PageHeader } from "@/components/PageHeader";
+import { AuctionTimeline, ZonePodium } from "@/components/ZonePodium";
+import { Magnetic } from "@/components/motion/Magnetic";
+import { Reveal } from "@/components/motion/Reveal";
 import { listCategories } from "@/lib/listings";
 import { formatINR } from "@/lib/money";
 import { biddingWeek, formatWeek } from "@/lib/week";
@@ -10,78 +14,63 @@ export const metadata: Metadata = { title: "Advertise" };
 
 export default async function AdvertisePage() {
   const cats = await listCategories();
-  const zones = [
-    { z: "Top 10", pos: "Positions 1–10", where: "Featured cards at the top of your category page, plus the homepage for the top 3." },
-    { z: "Top 50", pos: "Positions 11–50", where: "Labelled Sponsored rows inside the category list, one after every four organic rows." },
-    { z: "Top 100", pos: "Positions 51–100", where: "Sponsored rows further down the list. The entry-level paid spot." },
-  ];
   return (
-    <div className="wrap flex max-w-4xl flex-col gap-12 pt-10">
-      <header className="flex flex-col gap-4">
-        <p className="eyebrow">For businesses</p>
-        <h1 className="font-display text-[clamp(2rem,5vw,3.2rem)] font-semibold tracking-tight leading-[1.05] tracking-tight">Bid for the top spots in your category</h1>
-        <p className="max-w-2xl text-lg text-muted">
-          Every week, each category has 100 sponsored positions. The highest bids get the best spots. Listing stays free, and the organic
-          ranking is decided only by votes.
-        </p>
-        <div className="flex flex-wrap gap-2">
-          <Link href="/dashboard" className="btn-primary">Go to your dashboard</Link>
-          <span className="self-center font-mono text-sm text-muted">Now bidding for: {formatWeek(biddingWeek())}</span>
+    <div className="wrap flex max-w-5xl flex-col gap-24 pt-12">
+      <PageHeader
+        kicker={<span className="flex items-center gap-2"><span className="live-dot" /> Now bidding for {formatWeek(biddingWeek())}</span>}
+        title="Bid for the throne in your category."
+        description="Every week, each category has 100 sponsored positions. The highest bids win the best spots. Listing stays free, and the organic ranking is decided only by votes."
+      >
+        <div className="mt-2 flex flex-wrap gap-3">
+          <Magnetic><Link href="/dashboard" className="btn-primary rounded-full px-6 py-3">Go to your dashboard</Link></Magnetic>
+          <Link href="/dashboard/new" className="btn-ghost rounded-full px-6 py-3">List your startup first</Link>
         </div>
-      </header>
+      </PageHeader>
 
-      <section className="grid gap-3 sm:grid-cols-3">
-        {zones.map((z, i) => (
-          <div key={z.z} className="card flex flex-col gap-2 p-5">
-            <span className="font-display text-3xl font-semibold tracking-tight text-sponsor">{z.z}</span>
-            <span className="font-mono text-xs text-muted">{z.pos}</span>
-            <div className="h-1.5 rounded-full bg-line"><div className="h-full rounded-full bg-sponsor" style={{ width: `${[100, 58, 28][i]}%` }} /></div>
-            <p className="text-sm text-muted">{z.where}</p>
-          </div>
-        ))}
+      <section aria-labelledby="zones-h" className="flex flex-col gap-10">
+        <Reveal>
+          <p className="kicker">Three zones</p>
+          <h2 id="zones-h" className="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">The higher you bid, the closer to the crown.</h2>
+        </Reveal>
+        <ZonePodium />
       </section>
 
-      <section className="flex flex-col gap-4">
-        <h2 className="font-display text-2xl font-bold">How the weekly auction works</h2>
-        <ol className="grid gap-3 sm:grid-cols-2">
-          {[
+      <section aria-labelledby="how-h" className="flex flex-col gap-10">
+        <Reveal>
+          <p className="kicker">The weekly auction</p>
+          <h2 id="how-h" className="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">How the weekly auction works</h2>
+        </Reveal>
+        <AuctionTimeline
+          steps={[
             ["Add funds to your ad wallet", "Pay by UPI, card or netbanking (Razorpay) or by international card (Stripe)."],
             ["Place a bid for next week", `Bids start at your category's minimum and go up in steps of ${formatINR(config.bidStepPaise)}. You'll see live what it takes to reach each zone.`],
             ["Raise it if you're outbid", "Bids can be raised any time before the week starts. They can't be lowered or withdrawn, so no one can game the board."],
-            ["Monday 00:00 IST: auction closes", "The top 100 bids win positions in order and pay their bid. Every other bid goes straight back to your wallet."],
-          ].map(([t, d], i) => (
-            <li key={t} className="card flex gap-4 p-5">
-              <span className="font-display text-2xl font-semibold tracking-tight text-accent">{i + 1}</span>
-              <div>
-                <h3 className="font-semibold">{t}</h3>
-                <p className="mt-1 text-sm text-muted">{d}</p>
-              </div>
-            </li>
-          ))}
-        </ol>
-        <p className="text-sm text-muted">
+            ["Monday 00:00 IST: you reign", "The top 100 bids win positions in order and pay their bid. Every other bid goes straight back to your wallet."],
+          ]}
+        />
+        <Reveal className="rounded-[16px] border border-line bg-raised p-5 text-sm text-muted">
           Ties go to whoever bid that amount first. Your dashboard shows impressions, clicks and click-through rate for every day you&apos;re sponsored.
-        </p>
+        </Reveal>
       </section>
 
-      <section className="flex flex-col gap-3">
-        <h2 className="font-display text-2xl font-bold">Minimum bids by category</h2>
-        <div className="overflow-x-auto rounded-[10px] border border-line">
-          <table className="w-full min-w-[420px] bg-surface text-left text-sm">
-            <thead className="border-b border-line">
-              <tr><th className="p-3 font-semibold">Category</th><th className="p-3 text-right font-semibold">Minimum weekly bid</th></tr>
+      <Reveal as="section" className="flex flex-col gap-5">
+        <h2 className="text-3xl font-semibold tracking-tight">Minimum bids by category</h2>
+        <div className="ruled overflow-x-auto">
+          <table className="w-full min-w-[420px] text-left text-sm">
+            <thead className="border-b border-line bg-raised">
+              <tr><th className="kicker px-5 py-3 font-medium">Category</th><th className="kicker px-5 py-3 text-right font-medium">Minimum weekly bid</th></tr>
             </thead>
             <tbody>
               {cats.map((c) => (
-                <tr key={c.id} className="border-b border-line last:border-0">
-                  <td className="p-3"><Link href={`/c/${c.slug}`} className="hover:text-accent">{c.name}</Link></td>
-                  <td className="p-3 text-right font-mono tabular-nums">{formatINR(c.reservePaise)}</td>
+                <tr key={c.id} className="border-b border-line transition-colors last:border-0 hover:bg-raised">
+                  <td className="px-5 py-3.5"><Link href={`/c/${c.slug}`} className="font-medium hover:underline hover:underline-offset-4">{c.name}</Link></td>
+                  <td className="px-5 py-3.5 text-right font-mono tabular-nums">{formatINR(c.reservePaise)}</td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
-      </section>
+      </Reveal>
     </div>
   );
 }

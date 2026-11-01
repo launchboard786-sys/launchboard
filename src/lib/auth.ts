@@ -1,6 +1,7 @@
 import { SignJWT, jwtVerify } from "jose";
 import bcrypt from "bcryptjs";
 import { cookies } from "next/headers";
+import { cache } from "react";
 import { eq } from "drizzle-orm";
 import { db } from "@/db";
 import { users, type User } from "@/db/schema";
@@ -57,14 +58,17 @@ export function toSafeUser(u: User): SafeUser {
   return rest;
 }
 
-/** Current user from the session cookie, or null. Works in server components and route handlers. */
-export async function getCurrentUser(): Promise<SafeUser | null> {
+/**
+ * Current user from the session cookie, or null. Works in server components and route handlers.
+ * Wrapped in React's cache() so the header and the page share one database lookup per request.
+ */
+export const getCurrentUser = cache(async function getCurrentUser(): Promise<SafeUser | null> {
   const jar = await cookies();
   const userId = await readSession(jar.get(SESSION_COOKIE)?.value);
   if (!userId) return null;
   const [u] = await db.select().from(users).where(eq(users.id, userId));
   return u ? toSafeUser(u) : null;
-}
+});
 
 export async function requireUser(): Promise<SafeUser> {
   const u = await getCurrentUser();

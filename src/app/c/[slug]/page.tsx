@@ -6,6 +6,9 @@ import { db } from "@/db";
 import { categories } from "@/db/schema";
 import { BusinessRow } from "@/components/BusinessRow";
 import { FeaturedCard } from "@/components/FeaturedCard";
+import { EmptyState } from "@/components/EmptyState";
+import { PageHeader } from "@/components/PageHeader";
+import { Reveal, Stagger, StaggerItem } from "@/components/motion/Reveal";
 import { Pagination, SortTabs } from "@/components/Nav";
 import { ensureSettled, getPlacements } from "@/lib/auction";
 import { getCurrentUser } from "@/lib/auth";
@@ -54,36 +57,43 @@ export default async function CategoryPage({ params, searchParams }: Props) {
   await recordSponsoredImpressions([...top10.map((p) => p.business.id), ...inline.map((p) => p.business.id)]);
 
   return (
-    <div className="wrap flex flex-col gap-8 pt-10">
-      <header className="flex flex-col gap-3">
-        <nav className="text-sm text-muted"><Link href="/" className="hover:text-ink">Home</Link> / {cat.name}</nav>
-        <h1 className="font-display text-[clamp(2.2rem,5vw,3.4rem)] font-semibold leading-none tracking-[-0.03em]">{cat.name}</h1>
-        <p className="max-w-2xl text-lg text-muted">{cat.description}</p>
-      </header>
+    <div className="wrap flex flex-col gap-12 pt-12">
+      <PageHeader
+        kicker={<nav aria-label="Breadcrumb"><Link href="/" className="hover:text-ink">Home</Link> <span className="mx-1 opacity-50">/</span> Category</nav>}
+        title={cat.name}
+        description={<>{cat.description} <span className="text-ink">{organic.total.toLocaleString("en-IN")} listed.</span></>}
+      />
 
       {top10.length > 0 && (
         <section aria-labelledby="top10-h" className="flex flex-col gap-3">
-          <div className="flex items-baseline justify-between gap-3">
-            <h2 id="top10-h" className="font-display text-xl font-semibold tracking-tight">Featured: Top 10 this week</h2>
-            <Link href="/advertise" className="text-sm text-muted hover:text-ink">Get featured →</Link>
-          </div>
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5">
-            {top10.map((p) => <FeaturedCard key={p.business.id} business={p.business} position={p.position} />)}
-          </div>
+          <Reveal className="flex items-end justify-between gap-3">
+            <div>
+              <p className="kicker text-sponsor">Won at auction</p>
+              <h2 id="top10-h" className="mt-1.5 text-2xl font-semibold tracking-tight">Featured: Top 10 this week</h2>
+            </div>
+            <Link href="/advertise" className="text-sm text-muted transition-colors hover:text-ink">Get featured →</Link>
+          </Reveal>
+          <Stagger className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5">
+            {top10.map((p) => (
+              <StaggerItem key={p.business.id} className="h-full">
+                <FeaturedCard business={p.business} position={p.position} />
+              </StaggerItem>
+            ))}
+          </Stagger>
         </section>
       )}
 
       <section aria-labelledby="list-h" className="flex flex-col gap-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <h2 id="list-h" className="font-display text-xl font-semibold tracking-tight">
+          <h2 id="list-h" className="text-2xl font-semibold tracking-tight">
             All {cat.name} <span className="text-base font-medium tabular-nums text-muted">({organic.total.toLocaleString("en-IN")})</span>
           </h2>
           <SortTabs base={`/c/${cat.slug}`} current={sort} />
         </div>
         {feed.length === 0 ? (
-          <div className="card p-8 text-center text-muted">Nothing listed here yet. <Link href="/dashboard/new" className="font-semibold text-accent">Be the first.</Link></div>
+          <EmptyState title={`No ${cat.name} startups yet`} body="Be the first in this category. Early listings get the most attention, and the throne is wide open." href="/dashboard/new" cta="List your startup" />
         ) : (
-          <ol className="ruled">
+          <Stagger as="ol" className="ruled" key={`${sort}-${page}`}>
             {feed.map((f, i) => (
               <BusinessRow
                 key={`${f.kind}-${f.item.id}`}
@@ -93,7 +103,7 @@ export default async function CategoryPage({ params, searchParams }: Props) {
                 rank={f.kind === "organic" ? (page - 1) * 20 + feed.slice(0, i + 1).filter((x) => x.kind === "organic").length : undefined}
               />
             ))}
-          </ol>
+          </Stagger>
         )}
         <Pagination base={`/c/${cat.slug}`} page={organic.page} pageCount={organic.pageCount} params={{ sort }} />
       </section>

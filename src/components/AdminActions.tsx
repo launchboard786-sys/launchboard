@@ -2,9 +2,11 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { api } from "@/lib/client";
+import { useToast } from "./motion/Toast";
 
 export function ReviewButtons({ businessId }: { businessId: string }) {
   const router = useRouter();
+  const { toast } = useToast();
   const [rejecting, setRejecting] = useState(false);
   const [reason, setReason] = useState("");
   const [busy, setBusy] = useState(false);
@@ -15,6 +17,7 @@ export function ReviewButtons({ businessId }: { businessId: string }) {
     setErr(null);
     try {
       await api(`/api/admin/listings/${businessId}/review`, { action, reason: action === "reject" ? reason : undefined });
+      toast({ tone: action === "approve" ? "success" : "info", title: action === "approve" ? "Listing approved: it's live" : "Listing rejected", description: action === "reject" ? "The owner will see your reason." : undefined });
       router.refresh();
     } catch (e) {
       setErr(e instanceof Error ? e.message : "Failed");

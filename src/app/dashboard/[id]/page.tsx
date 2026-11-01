@@ -5,8 +5,12 @@ import { db } from "@/db";
 import { bids, placements } from "@/db/schema";
 import { StatusChip, ZoneChip } from "@/components/Badges";
 import { BidPanel } from "@/components/BidPanel";
+import { Notice as AnimatedNotice } from "@/components/Notice";
+import { Crown } from "@/components/Crown";
 import { Logo } from "@/components/Logo";
 import { StatsChart } from "@/components/StatsChart";
+import { CountUp } from "@/components/motion/CountUp";
+import { Reveal, Stagger, StaggerItem } from "@/components/motion/Reveal";
 import { ListingFeeForm, TopupForm } from "@/components/WalletPanel";
 import { ensureSettled, getAuctionBoard } from "@/lib/auction";
 import { config, enabledProviders } from "@/lib/config";
@@ -51,16 +55,15 @@ export default async function ManageBusiness({ params, searchParams }: Props) {
   const mine = board.find((r) => r.businessId === b.id);
   const providers = enabledProviders();
   const t = stats.totals;
-  const ctr = t.sponsoredImpressions ? ((t.sponsoredClicks / t.sponsoredImpressions) * 100).toFixed(1) + "%" : "–";
 
   return (
-    <div className="wrap flex flex-col gap-6 pt-10">
+    <div className="wrap flex flex-col gap-8 pt-10">
       <Notice saved={sp.saved} payment={sp.payment} />
       <header className="flex flex-wrap items-start gap-4">
         <Logo name={b.name} url={b.logoUrl} size={56} />
         <div className="min-w-0 flex-1 basis-56">
           <div className="flex flex-wrap items-center gap-2">
-            <h1 className="font-display text-3xl font-semibold tracking-tight">{b.name}</h1>
+            <h1 className="text-[clamp(1.9rem,4vw,2.6rem)] font-semibold leading-none tracking-[-0.035em]">{b.name}</h1>
             <StatusChip status={b.status} />
           </div>
           <p className="text-muted">{category.name} · {b.tagline}</p>
@@ -89,20 +92,24 @@ export default async function ManageBusiness({ params, searchParams }: Props) {
         </section>
       )}
 
-      <section className="grid grid-cols-2 gap-3 md:grid-cols-5">
+      <Stagger className="grid grid-cols-2 gap-3 md:grid-cols-5">
         {[
-          ["This week", placement ? `#${placement.position}` : "Not sponsored"],
-          ["Upvotes", b.voteCount.toLocaleString("en-IN")],
-          ["Impressions · 28d", t.sponsoredImpressions.toLocaleString("en-IN")],
-          ["Clicks · 28d", t.websiteClicks.toLocaleString("en-IN")],
-          ["Sponsored CTR", ctr],
-        ].map(([k, v], i) => (
-          <div key={k} className={`card min-w-0 p-4 ${i === 4 ? "col-span-2 md:col-span-1" : ""}`}>
-            <p className="eyebrow truncate">{k}</p>
-            <p className="mt-1 truncate font-display text-2xl font-bold tabular-nums">{v}</p>
-          </div>
+          { k: "This week", node: placement ? <span className={placement.position === 1 ? "gold-text" : ""}>#{placement.position}</span> : <span className="text-muted">Not sponsored</span>, gold: !!placement },
+          { k: "Upvotes", node: <CountUp value={b.voteCount} /> },
+          { k: "Impressions · 28d", node: <CountUp value={t.sponsoredImpressions} /> },
+          { k: "Clicks · 28d", node: <CountUp value={t.websiteClicks} /> },
+          { k: "Sponsored CTR", node: t.sponsoredImpressions ? <CountUp value={(t.sponsoredClicks / t.sponsoredImpressions) * 100} format="percent" /> : "–" },
+        ].map((s, i) => (
+          <StaggerItem
+            key={s.k}
+            className={`card group relative min-w-0 overflow-hidden p-4 transition-transform duration-300 hover:-translate-y-0.5 ${i === 4 ? "col-span-2 md:col-span-1" : ""} ${s.gold ? "border-sponsor/30" : ""}`}
+          >
+            {s.gold && <span aria-hidden className="absolute -right-6 -top-6 h-20 w-20 rounded-full bg-gold-hi/25 blur-2xl" />}
+            <p className="eyebrow relative truncate">{s.k}</p>
+            <p className="relative mt-1.5 truncate text-[1.7rem] font-semibold tracking-tight tabular-nums">{s.node}</p>
+          </StaggerItem>
         ))}
-      </section>
+      </Stagger>
 
       {placement && (
         <p className="flex flex-wrap items-center gap-2 text-sm text-muted">
@@ -110,8 +117,15 @@ export default async function ManageBusiness({ params, searchParams }: Props) {
         </p>
       )}
 
-      <section className="card p-6">
-        <h2 className="mb-4 font-display text-xl font-bold">Sponsored spot auction</h2>
+      <Reveal as="section" className="card relative overflow-hidden p-6 sm:p-8">
+        <div aria-hidden className="pointer-events-none absolute -right-24 -top-24 h-64 w-64 rounded-full bg-gold-hi/20 blur-3xl" />
+        <div className="relative mb-6 flex items-center gap-3">
+          <span className="grid h-10 w-10 place-items-center rounded-xl bg-sponsor-soft text-sponsor"><Crown size={20} /></span>
+          <div>
+            <h2 className="text-xl font-semibold tracking-tight">Sponsored spot auction</h2>
+            <p className="text-sm text-muted">Win a Top 10, Top 50 or Top 100 spot in {category.name} for next week.</p>
+          </div>
+        </div>
         {b.status === "APPROVED" ? (
           <BidPanel
             businessId={b.id}
@@ -123,13 +137,13 @@ export default async function ManageBusiness({ params, searchParams }: Props) {
             myBidPaise={myBid?.amountPaise ?? null}
             myPosition={mine?.position ?? null}
             zones={zonePrices(others, category.reservePaise)}
-            board={board.slice(0, 120).map((r) => ({ position: r.position, amountPaise: r.amountPaise, isYou: r.businessId === b.id }))}
+            board={board.slice(0, 120).map((r) => ({ id: r.id, position: r.position, amountPaise: r.amountPaise, isYou: r.businessId === b.id }))}
             totalBidders={board.length}
           />
         ) : (
           <p className="text-muted">Bidding opens once your listing is approved.</p>
         )}
-      </section>
+      </Reveal>
 
       <div className="grid gap-6 lg:grid-cols-[1.3fr_1fr]">
         <section className="card min-w-0 p-6">
@@ -140,8 +154,8 @@ export default async function ManageBusiness({ params, searchParams }: Props) {
           <div>
             <h2 className="font-display text-xl font-bold">Ad wallet</h2>
             <div className="mt-3 grid grid-cols-2 gap-3">
-              <div><p className="eyebrow">Available</p><p className="font-display text-2xl font-bold tabular-nums">{formatINR(wallet.availablePaise)}</p></div>
-              <div><p className="eyebrow">Held in bids</p><p className="font-display text-2xl font-bold tabular-nums text-muted">{formatINR(wallet.heldPaise)}</p></div>
+              <div><p className="eyebrow">Available</p><p className="mt-1 text-[1.9rem] font-semibold tracking-tight"><CountUp value={wallet.availablePaise / 100} format="inr" /></p></div>
+              <div><p className="eyebrow">Held in bids</p><p className="mt-1 text-[1.9rem] font-semibold tracking-tight text-muted"><CountUp value={wallet.heldPaise / 100} format="inr" /></p></div>
             </div>
           </div>
           {b.status === "APPROVED" || b.status === "PENDING_REVIEW" ? (
@@ -197,6 +211,5 @@ function Notice({ saved, payment }: { saved?: string; payment?: string }) {
     payment === "success" ? "Payment received. Thank you!" :
     payment === "pending" ? "Payment is processing. It will appear here as soon as the provider confirms it." :
     payment === "cancelled" ? "Payment cancelled. No money was taken." : null;
-  if (!msg) return null;
-  return <p role="status" className="rounded-[10px] border border-accent/40 bg-accent-soft/50 p-3 text-sm">{msg}</p>;
+  return <AnimatedNotice message={msg} />;
 }

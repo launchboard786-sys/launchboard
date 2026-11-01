@@ -1,11 +1,10 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { api } from "@/lib/client";
 
 export function AuthForm({ mode }: { mode: "login" | "signup" }) {
-  const router = useRouter();
   const params = useSearchParams();
   const next = params.get("next");
   const safeNext = next && next.startsWith("/") && !next.startsWith("//") ? next : "/dashboard";
@@ -19,8 +18,8 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
     const fd = new FormData(e.currentTarget);
     try {
       await api(`/api/auth/${mode}`, Object.fromEntries(fd));
-      router.push(safeNext);
-      router.refresh();
+      // Full load (not client navigation): pages preloaded while signed out must not be reused.
+      window.location.assign(safeNext);
     } catch (e) {
       setErr(e instanceof Error ? e.message : "Something went wrong.");
       setBusy(false);
@@ -28,7 +27,7 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
   }
 
   return (
-    <form onSubmit={onSubmit} className="card flex flex-col gap-4 p-6" noValidate>
+    <form onSubmit={onSubmit} className="flex flex-col gap-5" noValidate>
       {mode === "signup" && (
         <div>
           <label className="label" htmlFor="name">Your name</label>
@@ -44,9 +43,16 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
         <input className="input" id="password" name="password" type="password" autoComplete={mode === "login" ? "current-password" : "new-password"} required minLength={mode === "signup" ? 8 : 1} />
         {mode === "signup" && <p className="mt-1 text-xs text-muted">At least 8 characters.</p>}
       </div>
-      {err && <p role="alert" className="rounded-lg bg-bad/10 p-3 text-sm text-bad">{err}</p>}
-      <button className="btn-primary py-2.5" disabled={busy}>{busy ? "Please wait…" : mode === "login" ? "Log in" : "Create account"}</button>
-      <p className="text-center text-sm text-muted">
+      {err && <p role="alert" key={err} className="animate-[reign-shake_0.4s_ease] rounded-[12px] bg-bad/10 px-3.5 py-3 text-sm text-bad">{err}</p>}
+      <button className="btn-primary py-3 text-[15px]" disabled={busy}>
+        {busy ? (
+          <span className="flex items-center gap-2">
+            <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-bg/30 border-t-bg" />
+            Please wait…
+          </span>
+        ) : mode === "login" ? "Log in" : "Create account"}
+      </button>
+      <p className="text-sm text-muted">
         {mode === "login" ? (
           <>New here? <Link className="font-semibold text-accent" href={`/signup${next ? `?next=${encodeURIComponent(next)}` : ""}`}>Create an account</Link></>
         ) : (

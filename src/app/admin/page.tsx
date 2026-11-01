@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ReviewButtons, RefundForm, SettleButton } from "@/components/AdminActions";
+import { EmptyState } from "@/components/EmptyState";
+import { PageHeader } from "@/components/PageHeader";
+import { Stagger, StaggerItem } from "@/components/motion/Reveal";
 import { adminOverview, pendingListings, recentPayments, recentSettlements } from "@/lib/admin";
 import { requireAdminOrRedirect } from "@/lib/guards";
 import { formatINR } from "@/lib/money";
@@ -15,11 +18,11 @@ export default async function AdminPage() {
   return (
     <div className="wrap flex flex-col gap-8 pt-10">
       <div className="flex flex-wrap items-end justify-between gap-3">
-        <h1 className="font-display text-3xl font-semibold tracking-tight">Admin</h1>
+        <PageHeader size="md" kicker="Control room" title="Admin" />
         <Link href="/admin/categories" className="btn-ghost">Manage categories</Link>
       </div>
 
-      <section className="grid grid-cols-2 gap-3 md:grid-cols-6">
+      <Stagger className="grid grid-cols-2 gap-3 md:grid-cols-6">
         {[
           ["Ad revenue", formatINR(o.adRevenuePaise)],
           ["Listing fees", formatINR(o.listingFeesPaise)],
@@ -28,21 +31,21 @@ export default async function AdminPage() {
           ["Awaiting review", String(o.byStatus.PENDING_REVIEW ?? 0)],
           ["Users", String(o.users)],
         ].map(([k, v]) => (
-          <div key={k} className="card min-w-0 p-4">
+          <StaggerItem key={k} className="card min-w-0 p-4 transition-transform duration-300 hover:-translate-y-0.5">
             <p className="eyebrow truncate">{k}</p>
-            <p className="mt-1 truncate font-display text-2xl font-bold tabular-nums">{v}</p>
-          </div>
+            <p className="mt-1.5 truncate text-[1.6rem] font-semibold tracking-tight tabular-nums">{v}</p>
+          </StaggerItem>
         ))}
-      </section>
+      </Stagger>
 
       <section className="flex flex-col gap-3">
         <h2 className="font-display text-xl font-bold">Review queue ({pending.length})</h2>
         {pending.length === 0 ? (
-          <p className="card p-6 text-muted">All caught up.</p>
+          <EmptyState title="All caught up" body="New listings waiting for review will appear here." />
         ) : (
-          <ul className="flex flex-col gap-3">
+          <Stagger as="ul" className="flex flex-col gap-3">
             {pending.map(({ business: b, categoryName, ownerEmail }) => (
-              <li key={b.id} className="card grid gap-4 p-5 md:grid-cols-[1fr_auto]">
+              <StaggerItem as="li" key={b.id} className="card grid gap-4 p-5 md:grid-cols-[1fr_auto]">
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-baseline gap-2">
                     <Link href={`/b/${b.slug}`} className="font-display text-lg font-semibold hover:text-accent">{b.name}</Link>
@@ -53,9 +56,9 @@ export default async function AdminPage() {
                   <a className="mt-2 inline-block break-all font-mono text-xs text-accent" href={b.websiteUrl} target="_blank" rel="noopener noreferrer nofollow">{b.websiteUrl}</a>
                 </div>
                 <ReviewButtons businessId={b.id} />
-              </li>
+              </StaggerItem>
             ))}
-          </ul>
+          </Stagger>
         )}
       </section>
 

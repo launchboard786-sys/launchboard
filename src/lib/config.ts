@@ -11,7 +11,7 @@ function int(name: string, fallback: number): number {
 }
 
 export const config = {
-  appName: process.env.NEXT_PUBLIC_APP_NAME || "Launchboard",
+  appName: process.env.NEXT_PUBLIC_APP_NAME || "REIGN",
   appUrl: process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000",
   currency: "INR" as const,
 

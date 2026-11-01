@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { m } from "motion/react";
 import { api } from "@/lib/client";
 
 type Provider = "RAZORPAY" | "STRIPE" | "MOCK";
@@ -85,9 +86,16 @@ export function ProviderPicker({ providers, value, onChange }: { providers: Prov
     <fieldset className="flex flex-col gap-2">
       <legend className="label">Pay with</legend>
       {providers.map((p) => (
-        <label key={p} className={`flex cursor-pointer items-center gap-3 rounded-lg border p-3 text-sm ${value === p ? "border-accent bg-accent-soft/50" : "border-line"}`}>
-          <input type="radio" name="provider" value={p} checked={value === p} onChange={() => onChange(p)} className="accent-[rgb(var(--accent))]" />
-          {PROVIDER_LABEL[p]}
+        <label
+          key={p}
+          className={`relative flex cursor-pointer items-center gap-3 overflow-hidden rounded-[12px] border p-3.5 text-sm transition-colors duration-200 ${value === p ? "border-ink/40" : "border-line hover:border-ink/25"}`}
+        >
+          {value === p && <m.span layoutId="provider-pick" className="absolute inset-0 -z-0 bg-ink/[0.04]" transition={{ type: "spring", stiffness: 420, damping: 34 }} />}
+          <input type="radio" name="provider" value={p} checked={value === p} onChange={() => onChange(p)} className="peer absolute inset-0 z-[2] cursor-pointer opacity-0" />
+          <span className={`relative grid h-4 w-4 shrink-0 place-items-center rounded-full border-2 transition-colors ${value === p ? "border-ink" : "border-line"} peer-focus-visible:ring-2 peer-focus-visible:ring-ink/30`}>
+            {value === p && <m.span layoutId="provider-dot" className="h-1.5 w-1.5 rounded-full bg-ink" />}
+          </span>
+          <span className="relative">{PROVIDER_LABEL[p]}</span>
         </label>
       ))}
     </fieldset>
