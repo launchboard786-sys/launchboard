@@ -1,0 +1,58 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Launch-board identity: cool paper, deep ink, a signal-green accent for organic momentum
+   and an amber "sponsor" colour reserved only for paid placements. */
+:root {
+  --bg: 248 247 244;
+  --surface: 255 255 255;
+  --ink: 14 15 17;
+  --muted: 104 106 112;
+  --line: 228 226 220;
+  --accent: 12 120 88;
+  --accent-ink: 255 255 255;
+  --accent-soft: 226 242 235;
+  --sponsor: 166 98 0;
+  --sponsor-soft: 252 244 226;
+  --good: 16 128 80;
+  --warn: 170 92 16;
+  --bad: 186 38 38;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: 15 15 16;
+    --surface: 23 23 25;
+    --ink: 238 237 233;
+    --muted: 150 150 146;
+    --line: 46 46 48;
+    --accent: 84 204 160;
+    --accent-ink: 6 22 16;
+    --accent-soft: 22 48 40;
+    --sponsor: 236 172 70;
+    --sponsor-soft: 48 36 14;
+    --good: 84 200 140;
+    --warn: 236 150 80;
+    --bad: 240 112 112;
+    color-scheme: dark;
+  }
+}
+
+html { -webkit-text-size-adjust: 100%; }
+body { @apply bg-bg text-ink font-sans antialiased; }
+h1, h2, h3 { text-wrap: balance; }
+
+@layer components {
+  .btn { @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink; }
+  .btn-primary { @apply btn bg-ink text-bg hover:bg-ink/85; }
+  .btn-ghost { @apply btn border border-line bg-surface text-ink hover:border-ink/50; }
+  .btn-danger { @apply btn border border-bad/40 bg-surface text-bad hover:bg-bad/10; }
+  .card { @apply rounded-[10px] border border-line bg-surface; }
+  .label { @apply mb-1.5 block text-sm font-medium; }
+  .input { @apply w-full rounded-lg border border-line bg-surface px-3 py-2 text-[15px] text-ink placeholder:text-muted/70 focus:border-ink focus:outline-none focus:ring-2 focus:ring-ink/10; }
+  .eyebrow { @apply text-[12px] font-medium text-muted; }
+  .chip { @apply inline-flex items-center gap-1 whitespace-nowrap rounded-md px-1.5 py-0.5 text-[11px] font-semibold; }
+  .wrap { @apply mx-auto w-full max-w-page px-4 sm:px-6; }
+  .ruled { @apply divide-y divide-line overflow-hidden rounded-[10px] border border-line bg-surface; }
+}
