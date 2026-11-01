@@ -108,7 +108,7 @@ export default async function Home() {
           <Stagger className="grid grid-cols-1 border-t border-line sm:grid-cols-2 lg:grid-cols-3">
             {cats.map((c) => (
               <StaggerItem key={c.id}>
-                <Link prefetch={false} href={`/c/${c.slug}`} className="group relative flex min-w-0 items-center justify-between gap-4 border-b border-line py-4 sm:pr-6">
+                <Link prefetch={false} href={`/c/${c.slug}`} className="tap-row group relative flex min-w-0 items-center justify-between gap-4 border-b border-line py-4 sm:pr-6">
                   <span className="min-w-0">
                     <span className="block font-semibold transition-transform duration-300 ease-out group-hover:translate-x-1">{c.name}</span>
                     <span className="block truncate text-sm text-muted transition-transform delay-[30ms] duration-300 ease-out group-hover:translate-x-1">{c.description}</span>

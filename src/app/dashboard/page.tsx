@@ -48,7 +48,7 @@ export default async function Dashboard() {
             const t = totals.get(b.id);
             return (
               <StaggerItem as="li" key={b.id} className="min-w-0">
-                <Link prefetch={false} href={`/dashboard/${b.id}`} className="card group flex min-w-0 flex-col gap-5 p-5 transition-all duration-300 hover:-translate-y-1 hover:border-ink/25 hover:shadow-[0_24px_48px_-24px_rgb(var(--shadow)/0.35)]">
+                <Link prefetch={false} href={`/dashboard/${b.id}`} className="tap-card card group flex min-w-0 flex-col gap-5 p-5 transition-all duration-300 hover:-translate-y-1 hover:border-ink/25 hover:shadow-[0_24px_48px_-24px_rgb(var(--shadow)/0.35)]">
                   <div className="flex items-start gap-3">
                     <Logo name={b.name} url={b.logoUrl} />
                     <div className="min-w-0 flex-1">

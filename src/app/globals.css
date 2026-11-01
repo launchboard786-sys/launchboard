@@ -171,3 +171,20 @@ h1, h2, h3 { text-wrap: balance; }
 }
 
 @keyframes reign-shake { 0%, 100% { transform: translateX(0); } 20% { transform: translateX(-6px); } 40% { transform: translateX(6px); } 60% { transform: translateX(-4px); } 80% { transform: translateX(4px); } }
+
+/*
+  Touch feedback. Phones have no hover, so every tappable thing reacts the instant a finger lands:
+  links fade, buttons press in, rows and cards dip and shade. Release eases back.
+  (The browser's default grey tap flash is replaced by these designed states.)
+*/
+a, button, [role="tab"], summary, label { -webkit-tap-highlight-color: transparent; }
+@media (hover: none) {
+  a, button, [role="tab"], label { transition: opacity 0.25s ease, transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.25s ease; }
+  a:active, [role="tab"]:active { opacity: 0.55; transition-duration: 0s; }
+  button:active:not(:disabled), label:active { transform: scale(0.96); transition-duration: 0.06s; }
+  /* Whole-row and card links: a gentle dip with a shade instead of a fade. */
+  .tap-row:active { background-color: rgb(var(--ink) / 0.05); transition-duration: 0s; }
+  .tap-row:has(a:active) { background-color: rgb(var(--ink) / 0.05); transition-duration: 0s; }
+  .tap-card:active, .tap-card:has(> a:active) { transform: scale(0.98); transition-duration: 0.08s; }
+  .tap-row a:active, .tap-card a:active, a.tap-card:active { opacity: 1; }
+}
