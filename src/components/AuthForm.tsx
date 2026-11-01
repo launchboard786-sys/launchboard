@@ -47,6 +47,13 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
         {mode === "signup" && <p className="mt-1 text-xs text-muted">At least 8 characters.</p>}
       </div>
       {err && <p role="alert" key={err} className="animate-[reign-shake_0.4s_ease] rounded-[12px] bg-bad/10 px-3.5 py-3 text-sm text-bad">{err}</p>}
+      {mode === "signup" && (
+        <p className="text-xs leading-relaxed text-muted">
+          By creating an account you agree to our{" "}
+          <Link prefetch={false} href="/terms" className="underline underline-offset-2 hover:text-ink">Terms</Link> and{" "}
+          <Link prefetch={false} href="/privacy" className="underline underline-offset-2 hover:text-ink">Privacy Policy</Link>, and confirm you are 18 or older.
+        </p>
+      )}
       <button className="btn-primary py-3 text-[15px]" disabled={busy}>
         {busy ? (
           <span className="flex items-center gap-2">

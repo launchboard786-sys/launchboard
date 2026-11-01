@@ -8,6 +8,7 @@ import { NavProgress } from "@/components/NavProgress";
 import { Crown } from "@/components/Crown";
 import { MotionProvider } from "@/components/motion/Provider";
 import { config } from "@/lib/config";
+import { business } from "@/lib/legal";
 
 export const metadata: Metadata = {
   title: { default: `${config.appName}: discover what's launching`, template: `%s · ${config.appName}` },
@@ -57,7 +58,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   <Link prefetch={false} href="/dashboard" className="inline-block py-1.5 text-muted transition-colors hover:text-ink">Dashboard</Link>
                 </nav>
               </div>
-              <p className="text-xs text-muted">© {year} {config.appName}</p>
+              <div className="flex flex-col gap-3 border-t border-line pt-5 text-xs text-muted sm:flex-row sm:items-center sm:justify-between">
+                <p>© {year} {business.legalName}. {config.appName} is operated by {business.legalName}.</p>
+                <nav aria-label="Legal" className="flex flex-wrap gap-x-4">
+                  {[["/terms", "Terms"], ["/privacy", "Privacy"], ["/refunds", "Refunds"], ["/delivery", "Delivery"], ["/contact", "Contact"]].map(([href, label]) => (
+                    <Link key={href} prefetch={false} href={href!} className="inline-block py-1.5 transition-colors hover:text-ink">{label}</Link>
+                  ))}
+                </nav>
+              </div>
             </div>
             <div aria-hidden className="pointer-events-none mt-6 select-none overflow-hidden">
               <p

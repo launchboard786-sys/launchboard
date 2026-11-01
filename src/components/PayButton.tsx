@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { m } from "motion/react";
@@ -98,6 +99,10 @@ export function ProviderPicker({ providers, value, onChange }: { providers: Prov
           <span className="relative">{PROVIDER_LABEL[p]}</span>
         </label>
       ))}
+      <p className="mt-1 text-xs text-muted">
+        Card and bank details are handled by the payment partner, never stored by us. See our{" "}
+        <Link prefetch={false} href="/refunds" className="underline underline-offset-2 hover:text-ink">refund policy</Link>.
+      </p>
     </fieldset>
   );
 }
