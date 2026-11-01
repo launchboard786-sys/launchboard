@@ -3,7 +3,7 @@ import { config } from "./config";
 
 const trimmed = (min: number, max: number, label: string) =>
   z
-    .string({ required_error: `${label} is required.` })
+    .string({ error: `${label} is required.` })
     .trim()
     .min(min, `${label} must be at least ${min} characters.`)
     .max(max, `${label} must be at most ${max} characters.`);
