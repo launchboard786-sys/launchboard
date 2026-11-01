@@ -36,7 +36,7 @@ export default async function Dashboard() {
     <div className="wrap flex flex-col gap-10 pt-12">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <PageHeader size="md" kicker={`Hi ${user.name.split(" ")[0]}`} title="Your businesses" />
-        <Magnetic><Link href="/dashboard/new" className="btn-primary rounded-full px-5 py-2.5">+ Add a business</Link></Magnetic>
+        <Magnetic><Link prefetch={false} href="/dashboard/new" className="btn-primary rounded-full px-5 py-2.5">+ Add a business</Link></Magnetic>
       </div>
 
       {rows.length === 0 ? (
@@ -47,8 +47,8 @@ export default async function Dashboard() {
             const p = placeBy.get(b.id);
             const t = totals.get(b.id);
             return (
-              <StaggerItem as="li" key={b.id}>
-                <Link href={`/dashboard/${b.id}`} className="card group flex min-w-0 flex-col gap-5 p-5 transition-all duration-300 hover:-translate-y-1 hover:border-ink/25 hover:shadow-[0_24px_48px_-24px_rgb(var(--shadow)/0.35)]">
+              <StaggerItem as="li" key={b.id} className="min-w-0">
+                <Link prefetch={false} href={`/dashboard/${b.id}`} className="card group flex min-w-0 flex-col gap-5 p-5 transition-all duration-300 hover:-translate-y-1 hover:border-ink/25 hover:shadow-[0_24px_48px_-24px_rgb(var(--shadow)/0.35)]">
                   <div className="flex items-start gap-3">
                     <Logo name={b.name} url={b.logoUrl} />
                     <div className="min-w-0 flex-1">

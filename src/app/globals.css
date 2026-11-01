@@ -18,10 +18,10 @@
   --accent: 12 120 88;
   --accent-ink: 255 255 255;
   --accent-soft: 224 242 234;
-  --sponsor: 158 108 14;
+  --sponsor: 130 86 4;
   --sponsor-soft: 250 241 219;
   --gold-hi: 232 186 92;
-  --good: 16 128 80;
+  --good: 10 104 64;
   --warn: 170 92 16;
   --bad: 186 38 38;
   --obsidian: 9 9 11;
@@ -65,7 +65,40 @@ h1, h2, h3 { text-wrap: balance; }
 
 @keyframes reign-shimmer { 0% { background-position: -400px 0; } 100% { background-position: 400px 0; } }
 @keyframes reign-drift { 0%, 100% { transform: translate3d(0, 0, 0) scale(1); } 50% { transform: translate3d(4%, -3%, 0) scale(1.08); } }
-@keyframes reign-pulse-dot { 0%, 100% { box-shadow: 0 0 0 0 rgb(var(--accent) / 0.55); } 70% { box-shadow: 0 0 0 7px rgb(var(--accent) / 0); } }
+@keyframes reign-ping { 0% { transform: scale(1); opacity: 0.6; } 75%, 100% { transform: scale(3.2); opacity: 0; } }
+@keyframes reign-rise { from { opacity: 0; transform: translate3d(0, 14px, 0); } to { opacity: 1; transform: none; } }
+@keyframes reign-word { from { transform: translate3d(0, 105%, 0) rotate(4deg); } to { transform: none; } }
+@keyframes reign-throne { from { opacity: 0; transform: perspective(1000px) translate3d(0, 36px, 0) rotateX(16deg) scale(0.96); } to { opacity: 1; transform: none; } }
+@keyframes reign-page { from { opacity: 0; transform: translate3d(0, 8px, 0); } to { opacity: 1; transform: none; } }
+
+/*
+  Entrance animations are pure CSS so they start the moment HTML arrives,
+  without waiting for JavaScript (the main cause of a "stuck" first load on phones).
+  Only opacity and transform are animated: both run on the GPU.
+*/
+.rise { animation: reign-rise 0.8s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.word-in { animation: reign-word 0.9s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.throne-in { animation: reign-throne 1s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.page-enter { animation: reign-page 0.45s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.aurora { animation: reign-drift 20s ease-in-out infinite; will-change: transform; }
+
+/* Scroll reveals use the browser's native scroll-driven animations: zero JavaScript.
+   Browsers without support simply show the content. */
+@supports (animation-timeline: view()) {
+  .reveal {
+    /* "backwards": after revealing, the element's own hover transforms work normally. */
+    animation: reign-rise linear backwards;
+    animation-timeline: view();
+    /* Finishes early in the entry so nothing rests half-faded at the bottom of the screen. */
+    animation-range: entry 0% entry 30%;
+  }
+}
+
+/* Phones: keep the look, drop the expensive parts. */
+@media (max-width: 767px) {
+  .aurora { animation: none; }
+  .grain::after { display: none; }
+}
 
 @layer components {
   .btn {
@@ -114,7 +147,8 @@ h1, h2, h3 { text-wrap: balance; }
     box-shadow: 0 1px 2px rgb(var(--shadow) / 0.04), 0 16px 40px -24px rgb(var(--shadow) / 0.2);
   }
   .glass {
-    background: rgb(var(--bg) / 0.72);
+    /* Opaque enough that text stays readable even when dark sections scroll underneath. */
+    background: rgb(var(--bg) / 0.9);
     -webkit-backdrop-filter: saturate(1.6) blur(16px);
     backdrop-filter: saturate(1.6) blur(16px);
   }
@@ -123,7 +157,9 @@ h1, h2, h3 { text-wrap: balance; }
     background: linear-gradient(90deg, rgb(var(--line) / 0.7) 0px, rgb(var(--line) / 0.3) 120px, rgb(var(--line) / 0.7) 240px) 0 0 / 800px 100%;
     animation: reign-shimmer 1.4s linear infinite;
   }
-  .live-dot { @apply inline-block h-1.5 w-1.5 rounded-full bg-accent; animation: reign-pulse-dot 2s ease-out infinite; }
+  /* Pulse uses transform/opacity on a pseudo-element so it runs on the GPU. */
+  .live-dot { @apply relative inline-block h-1.5 w-1.5 rounded-full bg-accent; }
+  .live-dot::after { content: ""; position: absolute; inset: 0; border-radius: 9999px; background: rgb(var(--accent)); animation: reign-ping 2s cubic-bezier(0, 0, 0.2, 1) infinite; }
   .gold-text {
     background: linear-gradient(180deg, rgb(var(--gold-hi)), rgb(var(--sponsor)));
     -webkit-background-clip: text; background-clip: text; color: transparent;

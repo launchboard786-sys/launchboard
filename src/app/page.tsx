@@ -63,7 +63,7 @@ export default async function Home() {
         thrones={thrones.slice(0, 6)}
       />
 
-      <div className="wrap flex flex-col gap-24 pt-20">
+      <div className="wrap flex flex-col gap-16 pt-14 sm:gap-24 sm:pt-20">
         {featured.length > 0 && (
           <section aria-labelledby="featured-h" className="flex flex-col gap-6">
             <Reveal className="flex flex-wrap items-end justify-between gap-4">
@@ -74,7 +74,7 @@ export default async function Home() {
                   The top three <span className="chip bg-sponsor-soft text-sponsor">Sponsored</span> spots in each category. Always labelled, never mixed into the organic ranking.
                 </p>
               </div>
-              <Link href="/advertise" className="text-sm font-medium underline decoration-line underline-offset-4 transition-colors hover:decoration-ink">How the auction works</Link>
+              <Link prefetch={false} href="/advertise" className="text-sm font-medium underline decoration-line underline-offset-4 transition-colors hover:decoration-ink">How the auction works</Link>
             </Reveal>
             <WeekBoard rows={featured} />
           </section>
@@ -108,7 +108,7 @@ export default async function Home() {
           <Stagger className="grid grid-cols-1 border-t border-line sm:grid-cols-2 lg:grid-cols-3">
             {cats.map((c) => (
               <StaggerItem key={c.id}>
-                <Link href={`/c/${c.slug}`} className="group relative flex min-w-0 items-center justify-between gap-4 border-b border-line py-4 sm:pr-6">
+                <Link prefetch={false} href={`/c/${c.slug}`} className="group relative flex min-w-0 items-center justify-between gap-4 border-b border-line py-4 sm:pr-6">
                   <span className="min-w-0">
                     <span className="block font-semibold transition-transform duration-300 ease-out group-hover:translate-x-1">{c.name}</span>
                     <span className="block truncate text-sm text-muted transition-transform delay-[30ms] duration-300 ease-out group-hover:translate-x-1">{c.description}</span>
@@ -133,7 +133,7 @@ export default async function Home() {
                 <p className="kicker flex items-center gap-2"><span className="live-dot" /> Organic · by votes</p>
                 <h2 id="trend-h" className="mt-2 text-3xl font-semibold tracking-tight">Trending now</h2>
               </div>
-              <Link href="/search?sort=trending" className="text-sm text-muted transition-colors hover:text-ink">See all →</Link>
+              <Link prefetch={false} href="/search?sort=trending" className="text-sm text-muted transition-colors hover:text-ink">See all →</Link>
             </Reveal>
             {trending.items.length === 0 ? (
               <EmptyState title="The arena is empty" body="Be among the first businesses here. Early listings get the most attention." href="/dashboard/new" cta="List your startup" />
@@ -171,7 +171,7 @@ export default async function Home() {
                 ? `${freeLeft.toLocaleString("en-IN")} of ${config.freeListingLimit.toLocaleString("en-IN")} free listing spots left. Take one before they're gone.`
                 : "Get in front of the people looking for what you've built."}
             </p>
-            <Link href="/dashboard/new" className="btn-gold rounded-full px-6 py-3 text-base">Claim your spot</Link>
+            <Link prefetch={false} href="/dashboard/new" className="btn-gold rounded-full px-6 py-3 text-base">Claim your spot</Link>
           </div>
         </Reveal>
       </div>

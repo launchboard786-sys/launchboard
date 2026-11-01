@@ -15,15 +15,15 @@ export const metadata: Metadata = { title: "Advertise" };
 export default async function AdvertisePage() {
   const cats = await listCategories();
   return (
-    <div className="wrap flex max-w-5xl flex-col gap-24 pt-12">
+    <div className="wrap flex max-w-5xl flex-col gap-16 pt-10 sm:gap-24 sm:pt-12">
       <PageHeader
         kicker={<span className="flex items-center gap-2"><span className="live-dot" /> Now bidding for {formatWeek(biddingWeek())}</span>}
         title="Bid for the throne in your category."
         description="Every week, each category has 100 sponsored positions. The highest bids win the best spots. Listing stays free, and the organic ranking is decided only by votes."
       >
         <div className="mt-2 flex flex-wrap gap-3">
-          <Magnetic><Link href="/dashboard" className="btn-primary rounded-full px-6 py-3">Go to your dashboard</Link></Magnetic>
-          <Link href="/dashboard/new" className="btn-ghost rounded-full px-6 py-3">List your startup first</Link>
+          <Magnetic><Link prefetch={false} href="/dashboard" className="btn-primary rounded-full px-6 py-3">Go to your dashboard</Link></Magnetic>
+          <Link prefetch={false} href="/dashboard/new" className="btn-ghost rounded-full px-6 py-3">List your startup first</Link>
         </div>
       </PageHeader>
 
@@ -55,16 +55,16 @@ export default async function AdvertisePage() {
 
       <Reveal as="section" className="flex flex-col gap-5">
         <h2 className="text-3xl font-semibold tracking-tight">Minimum bids by category</h2>
-        <div className="ruled overflow-x-auto">
-          <table className="w-full min-w-[420px] text-left text-sm">
+        <div className="ruled overflow-x-auto" tabIndex={0} role="region" aria-label="Minimum bids by category">
+          <table className="w-full text-left text-sm">
             <thead className="border-b border-line bg-raised">
-              <tr><th className="kicker px-5 py-3 font-medium">Category</th><th className="kicker px-5 py-3 text-right font-medium">Minimum weekly bid</th></tr>
+              <tr><th className="kicker px-4 py-3 font-medium sm:px-5">Category</th><th className="kicker px-4 py-3 text-right font-medium sm:px-5">Min. weekly bid</th></tr>
             </thead>
             <tbody>
               {cats.map((c) => (
                 <tr key={c.id} className="border-b border-line transition-colors last:border-0 hover:bg-raised">
-                  <td className="px-5 py-3.5"><Link href={`/c/${c.slug}`} className="font-medium hover:underline hover:underline-offset-4">{c.name}</Link></td>
-                  <td className="px-5 py-3.5 text-right font-mono tabular-nums">{formatINR(c.reservePaise)}</td>
+                  <td className="px-4 py-3.5 sm:px-5"><Link prefetch={false} href={`/c/${c.slug}`} className="inline-block py-1 font-medium hover:underline hover:underline-offset-4">{c.name}</Link></td>
+                  <td className="whitespace-nowrap px-4 py-3.5 text-right font-mono tabular-nums sm:px-5">{formatINR(c.reservePaise)}</td>
                 </tr>
               ))}
             </tbody>

@@ -19,7 +19,7 @@ export default async function AdminPage() {
     <div className="wrap flex flex-col gap-8 pt-10">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <PageHeader size="md" kicker="Control room" title="Admin" />
-        <Link href="/admin/categories" className="btn-ghost">Manage categories</Link>
+        <Link prefetch={false} href="/admin/categories" className="btn-ghost">Manage categories</Link>
       </div>
 
       <Stagger className="grid grid-cols-2 gap-3 md:grid-cols-6">
@@ -48,7 +48,7 @@ export default async function AdminPage() {
               <StaggerItem as="li" key={b.id} className="card grid gap-4 p-5 md:grid-cols-[1fr_auto]">
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-baseline gap-2">
-                    <Link href={`/b/${b.slug}`} className="font-display text-lg font-semibold hover:text-accent">{b.name}</Link>
+                    <Link prefetch={false} href={`/b/${b.slug}`} className="font-display text-lg font-semibold hover:text-accent">{b.name}</Link>
                     <span className="text-sm text-muted">{categoryName} · {b.location} · {ownerEmail}</span>
                   </div>
                   <p className="mt-1 text-sm">{b.tagline}</p>
@@ -67,7 +67,7 @@ export default async function AdminPage() {
         <p className="text-sm text-muted">Settlement runs automatically (hourly cron + on first visit after Monday 00:00 IST). Use this if you need to run it by hand.</p>
         <SettleButton />
         {settles.length > 0 && (
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto" tabIndex={0} role="region" aria-label="Weekly auctions table">
             <table className="w-full min-w-[480px] text-left text-sm">
               <thead className="text-muted"><tr><th className="py-2 font-medium">Week</th><th className="py-2 text-right font-medium">Placed</th><th className="py-2 text-right font-medium">Released</th><th className="py-2 text-right font-medium">Revenue</th></tr></thead>
               <tbody>
@@ -87,7 +87,7 @@ export default async function AdminPage() {
 
       <section className="card flex flex-col gap-3 p-6">
         <h2 className="font-display text-xl font-bold">Recent payments</h2>
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto" tabIndex={0} role="region" aria-label="Recent payments table">
           <table className="w-full min-w-[620px] text-left text-sm">
             <thead className="text-muted"><tr><th className="py-2 font-medium">When</th><th className="py-2 font-medium">Business</th><th className="py-2 font-medium">Purpose</th><th className="py-2 font-medium">Provider</th><th className="py-2 font-medium">Status</th><th className="py-2 text-right font-medium">Amount</th></tr></thead>
             <tbody>

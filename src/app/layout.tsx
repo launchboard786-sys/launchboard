@@ -1,8 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import Link from "next/link";
-import "@fontsource-variable/geist";
-import "@fontsource-variable/geist-mono";
 import "./globals.css";
+import { geist, geistMono } from "./fonts";
 import { Suspense } from "react";
 import { Header } from "@/components/Header";
 import { NavProgress } from "@/components/NavProgress";
@@ -28,7 +27,7 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const year = new Date().getFullYear();
   return (
-    <html lang="en">
+    <html lang="en" className={`${geist.variable} ${geistMono.variable}`}>
       <body className="flex min-h-screen flex-col">
         <MotionProvider>
           <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[80] focus:rounded focus:bg-surface focus:px-3 focus:py-2">
@@ -51,11 +50,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                     Where new businesses rise. Organic rankings are decided by votes and are never for sale. Sponsored spots are always labelled.
                   </p>
                 </div>
-                <nav className="grid grid-cols-2 gap-x-12 gap-y-2.5 text-sm">
-                  <Link href="/search" className="text-muted transition-colors hover:text-ink">Explore</Link>
-                  <Link href="/advertise" className="text-muted transition-colors hover:text-ink">Advertise</Link>
-                  <Link href="/dashboard/new" className="text-muted transition-colors hover:text-ink">List your startup</Link>
-                  <Link href="/dashboard" className="text-muted transition-colors hover:text-ink">Dashboard</Link>
+                <nav className="grid grid-cols-2 gap-x-12 gap-y-0.5 text-sm">
+                  <Link prefetch={false} href="/search" className="inline-block py-1.5 text-muted transition-colors hover:text-ink">Explore</Link>
+                  <Link prefetch={false} href="/advertise" className="inline-block py-1.5 text-muted transition-colors hover:text-ink">Advertise</Link>
+                  <Link prefetch={false} href="/dashboard/new" className="inline-block py-1.5 text-muted transition-colors hover:text-ink">List your startup</Link>
+                  <Link prefetch={false} href="/dashboard" className="inline-block py-1.5 text-muted transition-colors hover:text-ink">Dashboard</Link>
                 </nav>
               </div>
               <p className="text-xs text-muted">© {year} {config.appName}</p>

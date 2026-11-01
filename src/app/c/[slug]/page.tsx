@@ -57,9 +57,9 @@ export default async function CategoryPage({ params, searchParams }: Props) {
   await recordSponsoredImpressions([...top10.map((p) => p.business.id), ...inline.map((p) => p.business.id)]);
 
   return (
-    <div className="wrap flex flex-col gap-12 pt-12">
+    <div className="wrap flex flex-col gap-10 pt-10 sm:gap-12 sm:pt-12">
       <PageHeader
-        kicker={<nav aria-label="Breadcrumb"><Link href="/" className="hover:text-ink">Home</Link> <span className="mx-1 opacity-50">/</span> Category</nav>}
+        kicker={<nav aria-label="Breadcrumb"><Link prefetch={false} href="/" className="inline-block py-1.5 hover:text-ink">Home</Link> <span className="mx-1 opacity-50">/</span> Category</nav>}
         title={cat.name}
         description={<>{cat.description} <span className="text-ink">{organic.total.toLocaleString("en-IN")} listed.</span></>}
       />
@@ -71,7 +71,7 @@ export default async function CategoryPage({ params, searchParams }: Props) {
               <p className="kicker text-sponsor">Won at auction</p>
               <h2 id="top10-h" className="mt-1.5 text-2xl font-semibold tracking-tight">Featured: Top 10 this week</h2>
             </div>
-            <Link href="/advertise" className="text-sm text-muted transition-colors hover:text-ink">Get featured →</Link>
+            <Link prefetch={false} href="/advertise" className="text-sm text-muted transition-colors hover:text-ink">Get featured →</Link>
           </Reveal>
           <Stagger className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5">
             {top10.map((p) => (

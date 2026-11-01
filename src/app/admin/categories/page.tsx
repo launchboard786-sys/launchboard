@@ -13,7 +13,7 @@ export default async function AdminCategories() {
   const cats = await listCategories();
   return (
     <div className="wrap flex flex-col gap-6 pt-10">
-      <nav className="text-sm text-muted"><Link href="/admin" className="hover:text-ink">Admin</Link> / Categories</nav>
+      <nav className="text-sm text-muted"><Link prefetch={false} href="/admin" className="inline-block py-1.5 hover:text-ink">Admin</Link> / Categories</nav>
       <PageHeader size="md" kicker="Admin" title="Categories" />
       <section className="card flex flex-col gap-3 p-6">
         <h2 className="font-display text-lg font-bold">Add category</h2>

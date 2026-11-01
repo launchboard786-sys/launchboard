@@ -69,8 +69,8 @@ export default async function ManageBusiness({ params, searchParams }: Props) {
           <p className="text-muted">{category.name} · {b.tagline}</p>
         </div>
         <div className="flex w-full gap-2 sm:w-auto">
-          <Link href={`/b/${b.slug}`} className="btn-ghost">View page</Link>
-          <Link href={`/dashboard/${b.id}/edit`} className="btn-ghost">Edit</Link>
+          <Link prefetch={false} href={`/b/${b.slug}`} className="btn-ghost">View page</Link>
+          <Link prefetch={false} href={`/dashboard/${b.id}/edit`} className="btn-ghost">Edit</Link>
         </div>
       </header>
 
@@ -169,7 +169,7 @@ export default async function ManageBusiness({ params, searchParams }: Props) {
         {ledger.length === 0 ? (
           <p className="mt-2 text-sm text-muted">No transactions yet.</p>
         ) : (
-          <div className="mt-3 overflow-x-auto">
+          <div className="mt-3 overflow-x-auto" tabIndex={0} role="region" aria-label="Wallet history table">
             <table className="w-full min-w-[520px] text-left text-sm">
               <thead className="text-muted">
                 <tr><th className="py-2 font-medium">When</th><th className="py-2 font-medium">Type</th><th className="py-2 font-medium">Details</th><th className="py-2 text-right font-medium">Available</th><th className="py-2 text-right font-medium">Held</th></tr>

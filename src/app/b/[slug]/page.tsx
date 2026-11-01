@@ -62,13 +62,13 @@ export default async function BusinessPage({ params, searchParams }: Props) {
           </div>
         )}
         <nav aria-label="Breadcrumb" className="kicker">
-          <Link href="/" className="hover:text-ink">Home</Link> <span className="mx-1 opacity-50">/</span>{" "}
-          <Link href={`/c/${category.slug}`} className="hover:text-ink">{category.name}</Link>
+          <Link prefetch={false} href="/" className="inline-block py-1.5 hover:text-ink">Home</Link> <span className="mx-1 opacity-50">/</span>{" "}
+          <Link prefetch={false} href={`/c/${category.slug}`} className="inline-block py-1.5 hover:text-ink">{category.name}</Link>
         </nav>
 
         <header className="mt-8 flex flex-col gap-6 sm:flex-row sm:items-start">
-          <Reveal y={10} className="shrink-0">
-            <div className={`rounded-[22px] p-1.5 ${placement ? "bg-gradient-to-b from-gold-hi/60 to-sponsor/30" : "bg-gradient-to-b from-line to-transparent"}`}>
+          <Reveal y={10} className="shrink-0 self-start">
+            <div className={`inline-flex rounded-[22px] p-1.5 ${placement ? "bg-gradient-to-b from-gold-hi/60 to-sponsor/30" : "bg-gradient-to-b from-line to-transparent"}`}>
               <Logo name={b.name} url={b.logoUrl} size={84} />
             </div>
           </Reveal>
@@ -91,18 +91,18 @@ export default async function BusinessPage({ params, searchParams }: Props) {
                   <svg width="14" height="14" viewBox="0 0 16 16" aria-hidden><path d="M5 11 11 5M6 5h5v5" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" /></svg>
                 </a>
               </Magnetic>
-              {isOwner && <Link href={`/dashboard/${b.id}`} className="btn-ghost rounded-full px-5 py-3">Manage listing</Link>}
+              {isOwner && <Link prefetch={false} href={`/dashboard/${b.id}`} className="btn-ghost rounded-full px-5 py-3">Manage listing</Link>}
             </Reveal>
           </div>
           {b.status === "APPROVED" && (
-            <Reveal delay={0.2} className="flex flex-col items-center gap-1.5">
+            <Reveal delay={0.2} className="flex items-center gap-3 self-start sm:flex-col sm:gap-1.5">
               <VoteButton businessId={b.id} count={b.voteCount} voted={voteRow.length > 0} />
               <span className="text-[11px] text-muted">Upvote</span>
             </Reveal>
           )}
         </header>
 
-        <Stagger className="mt-12 grid grid-cols-2 gap-px overflow-hidden rounded-[16px] border border-line bg-line sm:grid-cols-4">
+        <Stagger as="dl" className="mt-12 grid grid-cols-2 gap-px overflow-hidden rounded-[16px] border border-line bg-line sm:grid-cols-4">
           {[
             ["Category", category.name],
             ["Based in", b.location],
@@ -124,7 +124,7 @@ export default async function BusinessPage({ params, searchParams }: Props) {
           <aside className="flex flex-col gap-3 self-start rounded-[16px] border border-line bg-raised p-5 text-sm">
             <p className="font-semibold">Like what {b.name} is building?</p>
             <p className="text-muted">Upvotes push it up the organic ranking, which is never for sale.</p>
-            <Link href={`/c/${category.slug}`} className="mt-1 font-medium underline decoration-line underline-offset-4 hover:decoration-ink">More in {category.name} →</Link>
+            <Link prefetch={false} href={`/c/${category.slug}`} className="mt-1 inline-block py-1.5 font-medium underline decoration-line underline-offset-4 hover:decoration-ink">More in {category.name} →</Link>
           </aside>
         </Reveal>
       </div>
