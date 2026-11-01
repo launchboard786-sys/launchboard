@@ -72,7 +72,10 @@ export const config = {
 
 /** Image uploads: Supabase Storage in production, a local folder in development and tests. */
 export const storage = {
-  supabaseUrl: (process.env.SUPABASE_URL || "").replace(/\/+$/, ""),
+  /** Only the origin is used, so a pasted ".../rest/v1/" (Supabase's API URL) still works. */
+  supabaseUrl: (() => {
+    try { return process.env.SUPABASE_URL ? new URL(process.env.SUPABASE_URL).origin : ""; } catch { return ""; }
+  })(),
   /** Supabase → Project Settings → API Keys → secret key (or the legacy service_role key). Server only. */
   supabaseKey: process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY || "",
   bucket: process.env.SUPABASE_BUCKET || "uploads",
