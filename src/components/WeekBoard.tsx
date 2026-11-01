@@ -24,12 +24,12 @@ export function WeekBoard({ rows, limit = 6 }: { rows: Row[]; limit?: number }) 
       </div>
       {groups.map((g) => (
         <StaggerItem key={g.slug} className="grid gap-x-4 gap-y-2 px-4 py-3.5 transition-colors duration-300 hover:bg-raised md:grid-cols-[11rem_1fr_1fr_1fr] md:items-center md:px-5">
-          <Link href={`/c/${g.slug}`} className="text-sm font-semibold hover:underline hover:underline-offset-4">{g.name}</Link>
+          <Link prefetch={false} href={`/c/${g.slug}`} className="text-sm font-semibold hover:underline hover:underline-offset-4">{g.name}</Link>
           {[1, 2, 3].map((pos) => {
             const s = g.slots.find((x) => x.position === pos);
             return s ? (
-              <Link key={pos} href={`/b/${s.business.slug}?s=1`} className="group flex min-w-0 items-center gap-2.5">
-                <span className={`flex w-4 shrink-0 justify-center font-mono text-xs ${pos === 1 ? "text-sponsor" : "text-muted/60"}`}>
+              <Link prefetch={false} key={pos} href={`/b/${s.business.slug}?s=1`} className="group flex min-w-0 items-center gap-2.5">
+                <span className={`flex w-4 shrink-0 justify-center font-mono text-xs ${pos === 1 ? "text-sponsor" : "text-muted"}`}>
                   {pos === 1 ? <Crown size={14} /> : pos}
                 </span>
                 <span className="transition-transform duration-300 group-hover:scale-110">
@@ -38,7 +38,7 @@ export function WeekBoard({ rows, limit = 6 }: { rows: Row[]; limit?: number }) 
                 <span className={`truncate text-sm group-hover:underline group-hover:underline-offset-4 ${pos === 1 ? "font-semibold" : ""}`}>{s.business.name}</span>
               </Link>
             ) : (
-              <span key={pos} className="hidden items-center gap-2.5 text-sm text-muted/60 md:flex">
+              <span key={pos} className="hidden items-center gap-2.5 text-sm text-muted md:flex">
                 <span className="w-4 text-center font-mono text-xs">{pos}</span> Open spot
               </span>
             );

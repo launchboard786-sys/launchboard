@@ -1,14 +1,14 @@
 "use client";
-import { LazyMotion, MotionConfig, domMax } from "motion/react";
+import { LazyMotion, MotionConfig } from "motion/react";
 import { ToastProvider } from "./Toast";
 
-/**
- * Loads Motion's features once (domMax enables layout/shared animations) and makes every
- * animation honour the visitor's "reduce motion" setting.
- */
+/** Animation features load in the background after the page is visible, so they never block the first paint. */
+const loadFeatures = () => import("./features").then((m) => m.default);
+
+/** Makes every animation honour the visitor's "reduce motion" setting. */
 export function MotionProvider({ children }: { children: React.ReactNode }) {
   return (
-    <LazyMotion features={domMax}>
+    <LazyMotion features={loadFeatures}>
       <MotionConfig reducedMotion="user" transition={{ type: "spring", stiffness: 260, damping: 30 }}>
         <ToastProvider>{children}</ToastProvider>
       </MotionConfig>

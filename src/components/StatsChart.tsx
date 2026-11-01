@@ -19,7 +19,7 @@ export function StatsChart({ series }: { series: Point[] }) {
   const h = hover !== null ? series[hover] : null;
   return (
     <div className="relative">
-      <div className="overflow-x-auto">
+      <div className="overflow-x-auto" tabIndex={0} role="region" aria-label="Chart: views and clicks, last 28 days">
         <svg viewBox={`0 0 ${W} ${H}`} className="h-auto w-full min-w-[480px]" role="img" aria-label="Views and clicks over the last 28 days" onMouseLeave={() => setHover(null)}>
           <defs>
             <linearGradient id="bar" x1="0" x2="0" y1="0" y2="1">
@@ -30,7 +30,7 @@ export function StatsChart({ series }: { series: Point[] }) {
           {ticks.map((t) => (
             <g key={t}>
               <line x1={padL} x2={W} y1={y(t, maxImp)} y2={y(t, maxImp)} stroke="rgb(var(--line))" strokeDasharray={t ? "3 4" : undefined} />
-              <text x={padL - 8} y={y(t, maxImp) + 4} textAnchor="end" fontSize="10" fill="rgb(var(--muted))" fontFamily="'Geist Mono Variable', ui-monospace, monospace">{t.toLocaleString("en-IN")}</text>
+              <text x={padL - 8} y={y(t, maxImp) + 4} textAnchor="end" fontSize="10" fill="rgb(var(--muted))" fontFamily="var(--font-geist-mono), ui-monospace, monospace">{t.toLocaleString("en-IN")}</text>
             </g>
           ))}
           {series.map((s, i) => {
@@ -68,7 +68,7 @@ export function StatsChart({ series }: { series: Point[] }) {
                   />
                 )}
                 {i % 7 === 0 && (
-                  <text x={x + bw / 2} y={H - 7} textAnchor="middle" fontSize="10" fill="rgb(var(--muted))" fontFamily="'Geist Mono Variable', ui-monospace, monospace">{s.day.slice(5)}</text>
+                  <text x={x + bw / 2} y={H - 7} textAnchor="middle" fontSize="10" fill="rgb(var(--muted))" fontFamily="var(--font-geist-mono), ui-monospace, monospace">{s.day.slice(5)}</text>
                 )}
               </g>
             );

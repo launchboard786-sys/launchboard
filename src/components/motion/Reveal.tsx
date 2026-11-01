@@ -1,46 +1,37 @@
-"use client";
-import { m, type HTMLMotionProps, type Variants } from "motion/react";
+/**
+ * Scroll reveals, done in CSS (see .reveal in globals.css): no JavaScript, GPU-only,
+ * and content is always visible even before the page's scripts load.
+ * These are plain server components, so they add nothing to the browser bundle.
+ */
+import type { CSSProperties, HTMLAttributes, ReactNode } from "react";
 
-const ease = [0.16, 1, 0.3, 1] as const;
+type Tag = "div" | "section" | "li" | "header" | "ol" | "ul" | "dl";
+type Props = { as?: Tag; className?: string; children?: ReactNode; style?: CSSProperties; delay?: number; y?: number } & Omit<HTMLAttributes<HTMLElement>, "className" | "children" | "style">;
 
-/** Fades, lifts and un-blurs content as it scrolls into view (once). */
-export function Reveal({ delay = 0, y = 18, className, children, as = "div", ...rest }: { delay?: number; y?: number; as?: "div" | "section" | "li" | "header" } & HTMLMotionProps<"div">) {
-  const Comp = m[as] as typeof m.div;
+export function Reveal({ as = "div", className, children, delay: _delay, y: _y, ...rest }: Props) {
+  const Tag = as;
   return (
-    <Comp
-      className={className}
-      initial={{ opacity: 0, y, filter: "blur(6px)" }}
-      whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-      viewport={{ once: true, amount: 0.15 }}
-      transition={{ duration: 0.7, ease, delay }}
-      {...rest}
-    >
+    <Tag className={`reveal ${className ?? ""}`} {...rest}>
       {children}
-    </Comp>
+    </Tag>
   );
 }
 
-const container: Variants = { hidden: {}, show: { transition: { staggerChildren: 0.055, delayChildren: 0.05 } } };
-const item: Variants = {
-  hidden: { opacity: 0, y: 14, filter: "blur(4px)" },
-  show: { opacity: 1, y: 0, filter: "blur(0px)", transition: { duration: 0.6, ease } },
-};
-
-/** Parent that reveals its <StaggerItem> children one after another. */
-export function Stagger({ className, children, as = "div", ...rest }: { as?: "div" | "ol" | "ul" } & HTMLMotionProps<"div">) {
-  const Comp = m[as] as typeof m.div;
+/** Container for revealed items (each item animates as it enters the viewport, giving a natural stagger). */
+export function Stagger({ as = "div", className, children, delay: _d, y: _y, ...rest }: Props) {
+  const Tag = as;
   return (
-    <Comp className={className} variants={container} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.05 }} {...rest}>
+    <Tag className={className} {...rest}>
       {children}
-    </Comp>
+    </Tag>
   );
 }
 
-export function StaggerItem({ className, children, as = "div", ...rest }: { as?: "div" | "li" } & HTMLMotionProps<"div">) {
-  const Comp = m[as] as typeof m.div;
+export function StaggerItem({ as = "div", className, children, delay: _d, y: _y, ...rest }: Props) {
+  const Tag = as;
   return (
-    <Comp className={className} variants={item} {...rest}>
+    <Tag className={`reveal ${className ?? ""}`} {...rest}>
       {children}
-    </Comp>
+    </Tag>
   );
 }

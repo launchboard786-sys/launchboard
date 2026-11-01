@@ -18,7 +18,7 @@ export function SortTabs({ base, current, extra = {} }: { base: string; current:
         const qs = new URLSearchParams({ ...extra, sort: t.key }).toString();
         const on = active === t.key;
         return (
-          <Link
+          <Link prefetch={false}
             key={t.key}
             href={`${base}?${qs}`}
             onClick={() => setActive(t.key)}
@@ -39,9 +39,9 @@ export function Pagination({ base, page, pageCount, params = {} }: { base: strin
   const href = (p: number) => `${base}?${new URLSearchParams({ ...params, page: String(p) }).toString()}`;
   return (
     <nav aria-label="Pages" className="mt-8 flex items-center justify-between gap-3 text-sm">
-      {page > 1 ? <Link className="btn-ghost" href={href(page - 1)}>← Previous</Link> : <span />}
+      {page > 1 ? <Link prefetch={false} className="btn-ghost" href={href(page - 1)}>← Previous</Link> : <span />}
       <span className="font-mono text-xs text-muted">Page {page} of {pageCount}</span>
-      {page < pageCount ? <Link className="btn-ghost" href={href(page + 1)}>Next →</Link> : <span />}
+      {page < pageCount ? <Link prefetch={false} className="btn-ghost" href={href(page + 1)}>Next →</Link> : <span />}
     </nav>
   );
 }

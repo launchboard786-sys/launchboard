@@ -11,7 +11,7 @@ export function EmptyState({ title, body, href, cta }: { title: string; body: st
       </span>
       <p className="relative text-lg font-semibold tracking-tight">{title}</p>
       <p className="relative max-w-sm text-sm text-muted">{body}</p>
-      {href && cta && <Link href={href} className="btn-primary relative mt-2">{cta}</Link>}
+      {href && cta && <Link prefetch={false} href={href} className="btn-primary relative mt-2">{cta}</Link>}
     </div>
   );
 }

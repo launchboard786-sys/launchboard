@@ -8,7 +8,7 @@ export function FeaturedCard({ business, position, categoryName }: { business: B
   const first = position === 1;
   return (
     <Tilt max={8} glow={first ? "232 186 92" : "255 255 255"} className="h-full rounded-[16px]">
-      <Link
+      <Link prefetch={false}
         href={`/b/${business.slug}?s=1`}
         className={`group relative flex h-full min-w-0 flex-col gap-3 overflow-hidden rounded-[16px] border p-4 transition-shadow duration-300 ${
           first
@@ -24,7 +24,7 @@ export function FeaturedCard({ business, position, categoryName }: { business: B
               <span className="font-mono text-lg leading-none">01</span>
             </span>
           ) : (
-            <span className="font-mono text-lg leading-none tabular-nums text-muted/60">{String(position).padStart(2, "0")}</span>
+            <span className="font-mono text-lg leading-none tabular-nums text-muted">{String(position).padStart(2, "0")}</span>
           )}
         </div>
         <div className="min-w-0" style={{ transform: "translateZ(16px)" }}>

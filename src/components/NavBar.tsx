@@ -44,8 +44,8 @@ export function NavBar({ appName, user }: { appName: string; user: User }) {
         }`}
         style={{ paddingTop: "env(safe-area-inset-top, 0px)" }}
       >
-        <m.div className="wrap flex items-center gap-5" animate={{ height: scrolled ? 56 : 68 }} transition={{ type: "spring", stiffness: 300, damping: 34 }}>
-          <Link href="/" className="group flex shrink-0 items-center gap-2" aria-label={`${appName} home`}>
+        <div className={`wrap flex items-center gap-5 transition-[height] duration-300 ease-out ${scrolled ? "h-14" : "h-[68px]"}`}>
+          <Link prefetch={false} href="/" className="group flex shrink-0 items-center gap-2" aria-label={`${appName} home`}>
             <m.span whileHover={{ rotate: -8, scale: 1.08 }} transition={{ type: "spring", stiffness: 400, damping: 12 }} className={overHero ? "text-gold-hi" : "text-sponsor"}>
               <Crown size={22} />
             </m.span>
@@ -76,11 +76,11 @@ export function NavBar({ appName, user }: { appName: string; user: User }) {
             {links.map((l) => {
               const active = isActive(pathname, l.href);
               return (
-                <Link
+                <Link prefetch={false}
                   key={l.href}
                   href={l.href}
                   onMouseEnter={() => setHovered(l.href)}
-                  className={`relative hidden rounded-full px-3 py-1.5 sm:block ${active ? "" : overHero ? "text-white/70 hover:text-white" : "text-muted hover:text-ink"}`}
+                  className={`relative hidden rounded-full px-3 py-1.5 sm:block ${active ? "" : overHero ? "text-white/70 hover:text-white" : "text-ink/75 hover:text-ink"}`}
                   aria-current={active ? "page" : undefined}
                 >
                   {(hovered === l.href || (active && !hovered)) && (
@@ -95,16 +95,16 @@ export function NavBar({ appName, user }: { appName: string; user: User }) {
               );
             })}
             {user ? (
-              <button type="button" onClick={logout} className={`ml-1 rounded-full px-3 py-1.5 ${overHero ? "text-white/70 hover:text-white" : "text-muted hover:text-ink"}`}>
+              <button type="button" onClick={logout} className={`ml-1 rounded-full px-3 py-1.5 ${overHero ? "text-white/70 hover:text-white" : "text-ink/75 hover:text-ink"}`}>
                 Log out
               </button>
             ) : (
               <>
-                <Link href="/login" className={`hidden rounded-full px-3 py-1.5 sm:block ${overHero ? "text-white/70 hover:text-white" : "text-muted hover:text-ink"}`}>
+                <Link prefetch={false} href="/login" className={`hidden rounded-full px-3 py-1.5 sm:block ${overHero ? "text-white/70 hover:text-white" : "text-ink/75 hover:text-ink"}`}>
                   Log in
                 </Link>
                 <Magnetic className="ml-1">
-                  <Link
+                  <Link prefetch={false}
                     href="/dashboard/new"
                     className={overHero ? "btn rounded-full bg-white px-4 text-[rgb(var(--obsidian))] hover:bg-white/90" : "btn-primary rounded-full px-4"}
                   >
@@ -115,7 +115,7 @@ export function NavBar({ appName, user }: { appName: string; user: User }) {
               </>
             )}
           </nav>
-        </m.div>
+        </div>
       </m.header>
       <BottomNav pathname={pathname} signedIn={!!user} />
     </>
@@ -137,7 +137,7 @@ function BottomNav({ pathname, signedIn }: { pathname: string; signedIn: boolean
   return (
     <nav
       aria-label="Primary"
-      className="glass fixed inset-x-0 bottom-0 z-50 border-t border-line/70 sm:hidden"
+      className="fixed inset-x-0 bottom-0 z-50 border-t border-line/70 bg-bg/95 backdrop-blur-md sm:hidden"
       style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
     >
       <ul className="grid grid-cols-4">
@@ -145,7 +145,7 @@ function BottomNav({ pathname, signedIn }: { pathname: string; signedIn: boolean
           const active = isActive(pathname, t.href) || (t.href === "/login" && pathname === "/signup");
           return (
             <li key={t.label}>
-              <Link href={t.href} className={`relative flex flex-col items-center gap-0.5 py-2.5 text-[11px] font-medium ${active ? "text-ink" : "text-muted"}`} aria-current={active ? "page" : undefined}>
+              <Link prefetch={false} href={t.href} className={`relative flex flex-col items-center gap-0.5 py-2.5 text-[11px] font-medium ${active ? "text-ink" : "text-muted"}`} aria-current={active ? "page" : undefined}>
                 <AnimatePresence>
                   {active && (
                     <m.span layoutId="tab-marker" className="absolute top-0 h-[2px] w-8 rounded-full bg-ink" transition={{ type: "spring", stiffness: 500, damping: 36 }} />

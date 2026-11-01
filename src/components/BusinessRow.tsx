@@ -27,7 +27,7 @@ export function BusinessRow({
       }`}
     >
       {rank !== undefined && (
-        <span className={`hidden w-7 shrink-0 text-right font-mono text-sm tabular-nums sm:block ${rank === 1 ? "text-sponsor" : "text-muted/60"}`}>
+        <span className={`hidden w-7 shrink-0 text-right font-mono text-sm tabular-nums sm:block ${rank === 1 ? "text-sponsor" : "text-muted"}`}>
           {String(rank).padStart(2, "0")}
         </span>
       )}
@@ -36,7 +36,7 @@ export function BusinessRow({
       </span>
       <div className="min-w-0 flex-1">
         <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-          <Link
+          <Link prefetch={false}
             href={`/b/${business.slug}${sponsored ? "?s=1" : ""}`}
             className="text-[16.5px] font-semibold leading-tight tracking-tight after:absolute after:inset-0 after:content-[''] focus-visible:outline-none focus-visible:after:rounded-lg focus-visible:after:ring-2 focus-visible:after:ring-ink/30"
           >
