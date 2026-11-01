@@ -45,8 +45,10 @@ Demo logins after seeding:
 
 ```bash
 createdb launchboard_test
-npm test            # 71 unit + integration tests on real Postgres
-npm run test:e2e    # 27 browser tests (needs a seeded DB and a running app)
+npm test            # 83 unit + integration tests on real Postgres
+# Browser tests: start the app with a dev outbox so tests can read the emails it sends
+EMAIL_DEV_OUTBOX=$PWD/.e2e-outbox npm start &
+npm run test:e2e    # 34 browser tests (needs a seeded DB and a running app)
 npm run typecheck && npm run lint
 ```
 
@@ -58,6 +60,7 @@ What the tests prove includes:
 * losing bidders get every rupee back
 * the full founder journey, from listing to bidding, works in a browser
 * the CSRF and authorization checks hold
+* reset and verification links work once, expire, and resetting a password signs out other devices
 
 ## Deploy (Vercel + Supabase)
 
@@ -69,6 +72,14 @@ What the tests prove includes:
    SSL is handled automatically; no need to add `sslmode`.
 4. Later schema changes ship as SQL files to paste the same way (or run `npm run db:migrate` from a computer
    once the drizzle migrations table exists).
+
+**Email (password reset + verification)**
+1. Sign up at resend.com → **Domains** → add your domain and add the DNS records it shows.
+2. **API Keys** → create a key. In Vercel set `RESEND_API_KEY` and `EMAIL_FROM` (for example `REIGN <hello@yourdomain.com>`).
+3. Redeploy. New accounts now get a confirmation email and must confirm before voting or listing.
+   Accounts that existed before the upgrade are treated as confirmed.
+
+Upgrading a database created before this feature: run `upgrade-1-email.sql` once in the SQL Editor.
 
 ## Deploy (general)
 

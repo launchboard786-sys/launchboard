@@ -186,3 +186,22 @@ INSERT INTO "categories" ("id", "slug", "name", "description", "sort_order", "re
 (gen_random_uuid()::text, 'devtools', 'Developer Tools', 'APIs, infra and tools for builders.', 9, 100000),
 (gen_random_uuid()::text, 'agritech', 'Agritech', 'Technology for farms and food supply chains.', 10, 50000),
 (gen_random_uuid()::text, 'creator', 'Creator Economy', 'Tools and platforms for creators.', 11, 50000);
+
+-- Email verification + password reset (also shipped as upgrade-1-email.sql for existing databases)
+CREATE TYPE "public"."token_purpose" AS ENUM('VERIFY_EMAIL', 'RESET_PASSWORD');
+CREATE TABLE "auth_tokens" (
+	"id" text PRIMARY KEY NOT NULL,
+	"user_id" text NOT NULL,
+	"purpose" "token_purpose" NOT NULL,
+	"token_hash" text NOT NULL,
+	"expires_at" timestamp with time zone NOT NULL,
+	"used_at" timestamp with time zone,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
+	CONSTRAINT "auth_tokens_token_hash_unique" UNIQUE("token_hash")
+);
+
+ALTER TABLE "users" ADD COLUMN "email_verified_at" timestamp with time zone;
+ALTER TABLE "users" ADD COLUMN "password_changed_at" timestamp with time zone;
+ALTER TABLE "auth_tokens" ADD CONSTRAINT "auth_tokens_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;
+CREATE INDEX "auth_tokens_user_idx" ON "auth_tokens" USING btree ("user_id","purpose");
+ALTER TABLE "auth_tokens" ENABLE ROW LEVEL SECURITY;
