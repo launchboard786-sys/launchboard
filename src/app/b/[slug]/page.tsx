@@ -11,11 +11,13 @@ import { Crown } from "@/components/Crown";
 import { Magnetic } from "@/components/motion/Magnetic";
 import { Reveal, Stagger, StaggerItem } from "@/components/motion/Reveal";
 import { VoteButton } from "@/components/VoteButton";
+import { ShareButton } from "@/components/ShareButton";
 import { ensureSettled } from "@/lib/auction";
 import { getCurrentUser } from "@/lib/auth";
 import { recordPageView } from "@/lib/impressions";
 import { getBusinessBySlug } from "@/lib/listings";
 import { currentWeek } from "@/lib/week";
+import { config } from "@/lib/config";
 
 export const dynamic = "force-dynamic";
 type Props = { params: Promise<{ slug: string }>; searchParams: Promise<{ s?: string }> };
@@ -23,7 +25,15 @@ type Props = { params: Promise<{ slug: string }>; searchParams: Promise<{ s?: st
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const row = await getBusinessBySlug((await params).slug);
   if (!row || row.business.status !== "APPROVED") return {};
-  return { title: row.business.name, description: row.business.tagline };
+  const b = row.business;
+  const title = `${b.name}: ${b.tagline}`;
+  return {
+    title: b.name,
+    description: b.tagline,
+    alternates: { canonical: `/b/${b.slug}` },
+    openGraph: { title, description: `${b.name} on ${config.appName}. ${b.voteCount.toLocaleString("en-IN")} upvotes. Discover it and vote.`, url: `/b/${b.slug}` },
+    twitter: { card: "summary_large_image", title, description: b.tagline, images: [`/b/${b.slug}/opengraph-image`] },
+  };
 }
 
 export default async function BusinessPage({ params, searchParams }: Props) {
@@ -67,7 +77,7 @@ export default async function BusinessPage({ params, searchParams }: Props) {
           <Link prefetch={false} href={`/c/${category.slug}`} className="inline-block py-1.5 hover:text-ink">{category.name}</Link>
         </nav>
 
-        <header className="mt-8 flex flex-col gap-6 sm:flex-row sm:items-start">
+        <header className="relative z-20 mt-8 flex flex-col gap-6 sm:flex-row sm:items-start">
           <Reveal y={10} className="shrink-0 self-start">
             <div className={`inline-flex rounded-[22px] p-1.5 ${placement ? "bg-gradient-to-b from-gold-hi/60 to-sponsor/30" : "bg-gradient-to-b from-line to-transparent"}`}>
               <Logo name={b.name} url={b.logoUrl} size={84} />
@@ -92,6 +102,14 @@ export default async function BusinessPage({ params, searchParams }: Props) {
                   <svg width="14" height="14" viewBox="0 0 16 16" aria-hidden><path d="M5 11 11 5M6 5h5v5" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" /></svg>
                 </a>
               </Magnetic>
+              {b.status === "APPROVED" && (
+                <ShareButton
+                  path={`/b/${b.slug}`}
+                  title={`${b.name} on ${config.appName}`}
+                  text={isOwner ? `We're on ${config.appName}! Check out ${b.name} and give us an upvote:` : `${b.name}: ${b.tagline}. Found it on ${config.appName}:`}
+                  label={isOwner ? "Share your listing" : "Share"}
+                />
+              )}
               {isOwner && <Link prefetch={false} href={`/dashboard/${b.id}`} className="btn-ghost rounded-full px-5 py-3">Manage listing</Link>}
             </Reveal>
           </div>

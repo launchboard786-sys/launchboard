@@ -14,6 +14,8 @@ export const metadata: Metadata = {
   title: { default: `${config.appName}: discover what's launching`, template: `%s · ${config.appName}` },
   description: "Discover new startups and businesses before everyone else. Upvote what you like. Bid for the top spots.",
   metadataBase: new URL(config.appUrl),
+  openGraph: { siteName: config.appName, type: "website", locale: "en_IN" },
+  twitter: { card: "summary_large_image" },
 };
 export const viewport: Viewport = {
   width: "device-width",

@@ -27,7 +27,7 @@ async function getCategory(slug: string) {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const c = await getCategory((await params).slug);
-  return c ? { title: `${c.name} startups`, description: c.description } : {};
+  return c ? { title: `${c.name} startups`, description: c.description, openGraph: { title: `Top ${c.name} startups`, description: c.description, url: `/c/${c.slug}` }, twitter: { card: "summary_large_image", title: `Top ${c.name} startups`, images: [`/c/${c.slug}/opengraph-image`] } } : {};
 }
 
 export default async function CategoryPage({ params, searchParams }: Props) {
