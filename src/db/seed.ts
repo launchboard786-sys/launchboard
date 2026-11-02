@@ -125,7 +125,7 @@ function rng(seed: number) {
 async function main() {
   const rand = rng(42);
   console.log("Resetting tables…");
-  await db.execute(sql`truncate table auth_tokens, users, categories, businesses, votes, wallets, ledger_entries, bids, settlements, placements, payments, daily_stats cascade`);
+  await db.execute(sql`truncate table notifications, auth_tokens, users, categories, businesses, votes, wallets, ledger_entries, bids, settlements, placements, payments, daily_stats cascade`);
 
   const [admin] = await db.insert(users).values({ email: "admin@launchboard.dev", name: "Admin", passwordHash: await hashPassword("admin12345"), role: "ADMIN", emailVerifiedAt: new Date() }).returning();
   const [founder] = await db.insert(users).values({ email: "founder@launchboard.dev", name: "Demo Founder", passwordHash: await hashPassword("founder12345"), emailVerifiedAt: new Date() }).returning();

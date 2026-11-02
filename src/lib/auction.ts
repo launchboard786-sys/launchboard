@@ -6,6 +6,7 @@ import { AppError, forbidden, notFound } from "./errors";
 import { checkBidAmount, rankBids } from "./rules";
 import { biddingWeek, currentWeek, formatWeek } from "./week";
 import { chargeHeld, hold, releaseHeld } from "./wallet";
+import { defer, notifySettlement, significantDrops, type Outcome, type RankedBid } from "./notify";
 
 /**
  * Settlement of a week takes an exclusive advisory lock; bid placement takes a shared one.
@@ -73,7 +74,19 @@ export async function placeBid(params: { userId: string; businessId: string; amo
       bidId = inserted[0].id;
     }
     await hold(tx, biz.id, delta, bidId, `Bid for ${formatWeek(weekStart)}`);
-    return { bidId, weekStart, amountPaise: params.amountPaise };
+
+    // Who did this bid push down? (used for outbid alerts, sent after the response)
+    const live = await tx
+      .select({ id: bids.id, businessId: bids.businessId, amountPaise: bids.amountPaise, amountSetAt: bids.amountSetAt })
+      .from(bids)
+      .where(and(eq(bids.weekStart, weekStart), eq(bids.categoryId, biz.categoryId), eq(bids.status, "ACTIVE")));
+    const afterRanked: RankedBid[] = rankBids(live);
+    const beforeList = live
+      .filter((b) => b.businessId !== biz.id || existing)
+      .map((b) => (b.businessId === biz.id && existing ? { ...b, amountPaise: existing.amountPaise, amountSetAt: existing.amountSetAt } : b));
+    const beforeRanked: RankedBid[] = rankBids(beforeList);
+    const displaced = significantDrops(beforeRanked, afterRanked, biz.id);
+    return { bidId, weekStart, amountPaise: params.amountPaise, outbid: { weekStart, reservePaise: cat.reservePaise, ranked: afterRanked, displaced } };
   });
 }
 
@@ -101,7 +114,7 @@ export async function getAuctionBoard(categoryId: string, weekStart: Date) {
 
 // ---------------------------------------------------------------- settlement
 
-export type SettlementResult = { weekStart: Date; alreadySettled: boolean; winners: number; losers: number; revenuePaise: number };
+export type SettlementResult = { weekStart: Date; alreadySettled: boolean; winners: number; losers: number; revenuePaise: number; outcomes?: Outcome[] };
 
 /**
  * Close the auction for `weekStart`: top N bids per category win and are charged,
@@ -111,7 +124,7 @@ export async function settleWeek(weekStart: Date, now = new Date()): Promise<Set
   if (now.getTime() < weekStart.getTime()) {
     throw new AppError(400, "TOO_EARLY", "This week's auction is still open.");
   }
-  return db.transaction(async (tx) => {
+  const result = await db.transaction(async (tx): Promise<SettlementResult> => {
     await lockWeekExclusive(tx, weekStart);
     const [done] = await tx.select().from(settlements).where(eq(settlements.weekStart, weekStart));
     if (done) {
@@ -147,6 +160,7 @@ export async function settleWeek(weekStart: Date, now = new Date()): Promise<Set
 
     let winners = 0;
     let revenuePaise = 0;
+    const outcomes: Outcome[] = [];
     const losers: typeof rows = [...ineligible];
     const note = formatWeek(weekStart);
 
@@ -165,6 +179,7 @@ export async function settleWeek(weekStart: Date, now = new Date()): Promise<Set
           await chargeHeld(tx, b.businessId, b.amountPaise, b.id, `${note}: won position #${b.position}`);
           winners++;
           revenuePaise += b.amountPaise;
+          outcomes.push({ businessId: b.businessId, position: b.position, amountPaise: b.amountPaise });
         } else {
           losers.push(b);
         }
@@ -173,11 +188,18 @@ export async function settleWeek(weekStart: Date, now = new Date()): Promise<Set
     for (const b of losers) {
       await tx.update(bids).set({ status: "LOST" }).where(eq(bids.id, b.id));
       await releaseHeld(tx, b.businessId, b.amountPaise, b.id, `${note}: not placed, funds released`);
+      outcomes.push({ businessId: b.businessId, position: null, amountPaise: b.amountPaise });
     }
 
     await tx.insert(settlements).values({ weekStart, winners, losers: losers.length, revenuePaise });
-    return { weekStart, alreadySettled: false, winners, losers: losers.length, revenuePaise };
+    return { weekStart, alreadySettled: false, winners, losers: losers.length, revenuePaise, outcomes };
   });
+  // Results emails go out only after the money moves are committed.
+  if (!result.alreadySettled && result.outcomes?.length) {
+    const outcomes = result.outcomes;
+    defer(() => notifySettlement(weekStart, outcomes));
+  }
+  return result;
 }
 
 /** Settle every past week that still has open bids. Returns results per week. */

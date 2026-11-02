@@ -9,6 +9,7 @@ import {
   uniqueIndex,
   index,
   check,
+  boolean,
 } from "drizzle-orm/pg-core";
 import { relations, sql } from "drizzle-orm";
 import { randomUUID } from "node:crypto";
@@ -49,6 +50,8 @@ export const users = pgTable("users", {
   emailVerifiedAt: timestamp("email_verified_at", { withTimezone: true }),
   /** Sessions issued before this moment are rejected (logs out other devices after a reset). */
   passwordChangedAt: timestamp("password_changed_at", { withTimezone: true }),
+  /** Optional alerts (outbid, vote milestones). Account and payment emails are always sent. */
+  emailAlerts: boolean("email_alerts").notNull().default(true),
   createdAt: createdAt(),
 });
 
@@ -263,6 +266,22 @@ export const businessesRelations = relations(businesses, ({ one, many }) => ({
 export const categoriesRelations = relations(categories, ({ many }) => ({
   businesses: many(businesses),
 }));
+
+/** Log of alert emails: prevents duplicates (dedupeKey) and enforces throttles. */
+export const notifications = pgTable(
+  "notifications",
+  {
+    id: id(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    businessId: text("business_id").references(() => businesses.id, { onDelete: "cascade" }),
+    kind: text("kind").notNull(),
+    dedupeKey: text("dedupe_key").unique(),
+    createdAt: createdAt(),
+  },
+  (t) => [index("notifications_biz_kind_idx").on(t.businessId, t.kind, t.createdAt)],
+);
 
 export type User = typeof users.$inferSelect;
 export type Category = typeof categories.$inferSelect;
