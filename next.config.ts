@@ -2,6 +2,8 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   poweredByHeader: false,
+  // Share-card fonts are read from disk at runtime; make sure Vercel ships them.
+  outputFileTracingIncludes: { "/**": ["./src/og-fonts/**/*"] },
   async headers() {
     return [
       {
