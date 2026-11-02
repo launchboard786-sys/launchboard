@@ -13,6 +13,8 @@ import { ensureSettled, getPlacementsForBusinesses } from "@/lib/auction";
 import { requireUserOrRedirect } from "@/lib/guards";
 import { needsVerification } from "@/lib/auth";
 import { VerifyBanner } from "@/components/AccountForms";
+import { AlertsToggle } from "@/components/AlertsToggle";
+import { emailEnabled } from "@/lib/config";
 import { Notice } from "@/components/Notice";
 import { formatINR } from "@/lib/money";
 import { statsTotalsFor } from "@/lib/stats";
@@ -89,6 +91,7 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
           })}
         </Stagger>
       )}
+      {emailEnabled() && rows.length > 0 && <AlertsToggle initial={user.emailAlerts} />}
     </div>
   );
 }
