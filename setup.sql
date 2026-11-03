@@ -224,3 +224,8 @@ ALTER TABLE "notifications" ADD CONSTRAINT "notifications_user_id_users_id_fk" F
 ALTER TABLE "notifications" ADD CONSTRAINT "notifications_business_id_businesses_id_fk" FOREIGN KEY ("business_id") REFERENCES "public"."businesses"("id") ON DELETE cascade ON UPDATE no action;
 CREATE INDEX "notifications_biz_kind_idx" ON "notifications" USING btree ("business_id","kind","created_at");
 ALTER TABLE "notifications" ENABLE ROW LEVEL SECURITY;
+
+-- Sign in with Google (also shipped as upgrade-4-google.sql)
+ALTER TABLE "users" ALTER COLUMN "password_hash" DROP NOT NULL;
+ALTER TABLE "users" ADD COLUMN "google_sub" text;
+ALTER TABLE "users" ADD CONSTRAINT "users_google_sub_unique" UNIQUE("google_sub");

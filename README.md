@@ -47,7 +47,8 @@ Demo logins after seeding:
 createdb launchboard_test
 npm test            # 83 unit + integration tests on real Postgres
 # Browser tests: start the app with a dev outbox so tests can read the emails it sends
-EMAIL_DEV_OUTBOX=$PWD/.e2e-outbox npm start &
+EMAIL_DEV_OUTBOX=$PWD/.e2e-outbox GOOGLE_CLIENT_ID=test-client GOOGLE_CLIENT_SECRET=test-secret \
+  GOOGLE_OAUTH_TEST_BASE=http://localhost:4588 npm start &   # fake Google runs inside the tests
 npm run test:e2e    # 34 browser tests (needs a seeded DB and a running app)
 npm run typecheck && npm run lint
 ```
@@ -80,6 +81,10 @@ What the tests prove includes:
    Accounts that existed before the upgrade are treated as confirmed.
 
 Upgrading a database created before this feature: run `upgrade-1-email.sql` once in the SQL Editor.
+
+**Sign in with Google** (optional): Google Cloud Console → Google Auth Platform → create a Web client with the
+redirect URI `https://YOUR-DOMAIN/api/auth/google/callback`, then set `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET`.
+Run `upgrade-4-google.sql` on databases created before this feature.
 
 ## Deploy (general)
 
