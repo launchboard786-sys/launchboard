@@ -44,7 +44,10 @@ export const users = pgTable("users", {
   id: id(),
   email: text("email").notNull().unique(),
   name: text("name").notNull(),
-  passwordHash: text("password_hash").notNull(),
+  /** Null for accounts created with Google that never set a password. */
+  passwordHash: text("password_hash"),
+  /** Google account id ("sub"), set when the user signs in with Google. */
+  googleSub: text("google_sub").unique(),
   role: roleEnum("role").notNull().default("USER"),
   /** Set when the user clicks the link in their verification email. */
   emailVerifiedAt: timestamp("email_verified_at", { withTimezone: true }),
