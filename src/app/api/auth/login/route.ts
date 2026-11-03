@@ -17,7 +17,8 @@ export const POST = route(async (req) => {
   rateLimit(`login:${clientKey(req)}`, 20, 15 * 60_000);
   rateLimit(`login-email:${input.email}`, 8, 15 * 60_000);
   const [u] = await db.select().from(users).where(eq(users.email, input.email));
-  const ok = await verifyPassword(input.password, u?.passwordHash ?? (await getDummyHash()));
+  // Google-only accounts have no password: compare against a dummy so timing and the message stay identical.
+  const ok = (await verifyPassword(input.password, u?.passwordHash ?? (await getDummyHash()))) && !!u?.passwordHash;
   if (!u || !ok) throw new AppError(401, "BAD_CREDENTIALS", "Email or password is incorrect.");
   const res = NextResponse.json({ ok: true, role: u.role });
   res.cookies.set(SESSION_COOKIE, await signSession(u.id), sessionCookieOptions());
