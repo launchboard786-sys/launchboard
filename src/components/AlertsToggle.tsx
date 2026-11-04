@@ -29,9 +29,13 @@ export function AlertsToggle({ initial }: { initial: boolean }) {
         aria-describedby="alerts-desc"
         onClick={flip}
         disabled={busy}
-        className={`relative h-8 w-14 shrink-0 rounded-full transition-colors duration-200 ${on ? "bg-accent" : "bg-ink/20"}`}
+        className={`relative block h-8 w-14 shrink-0 rounded-full p-0 transition-colors duration-200 disabled:cursor-wait ${on ? "bg-accent" : "bg-ink/20"}`}
       >
-        <span className={`absolute top-1 h-6 w-6 rounded-full bg-white shadow transition-transform duration-200 ${on ? "translate-x-7" : "translate-x-1"}`} />
+        <span className="sr-only">{on ? "On" : "Off"}</span>
+        <span
+          aria-hidden
+          className={`absolute left-0 top-1 h-6 w-6 rounded-full bg-white shadow-[0_1px_3px_rgba(0,0,0,0.3)] transition-transform duration-200 ease-out ${on ? "translate-x-[28px]" : "translate-x-1"}`}
+        />
       </button>
     </div>
   );
