@@ -7,6 +7,7 @@ import { Header } from "@/components/Header";
 import { NavProgress } from "@/components/NavProgress";
 import { Crown } from "@/components/Crown";
 import { MotionProvider } from "@/components/motion/Provider";
+import { InstallPrompt, ServiceWorker } from "@/components/InstallPrompt";
 import { config } from "@/lib/config";
 import { business } from "@/lib/legal";
 
@@ -15,6 +16,7 @@ export const metadata: Metadata = {
   description: "Discover new startups and businesses before everyone else. Upvote what you like. Bid for the top spots.",
   metadataBase: new URL(config.appUrl),
   openGraph: { siteName: config.appName, type: "website", locale: "en_IN" },
+  appleWebApp: { capable: true, title: config.appName, statusBarStyle: "black-translucent" },
   twitter: { card: "summary_large_image" },
 };
 export const viewport: Viewport = {
@@ -41,6 +43,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </Suspense>
           <Header />
           <main id="main" className="flex-1">{children}</main>
+          <ServiceWorker />
+          <InstallPrompt />
           <footer className="relative mt-24 overflow-hidden border-t border-line pb-24 sm:pb-0">
             <div className="wrap flex flex-col gap-10 pt-14">
               <div className="flex flex-col gap-8 sm:flex-row sm:items-start sm:justify-between">
