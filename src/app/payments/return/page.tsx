@@ -26,7 +26,8 @@ export default async function PaymentReturn({ searchParams }: { searchParams: Pr
         provider: "STRIPE",
         providerOrderId: session.id,
         providerPaymentId: typeof session.payment_intent === "string" ? session.payment_intent : (session.payment_intent?.id ?? session.id),
-        amountPaise: session.amount_total,
+        amountMinor: session.amount_total,
+        currency: session.currency ?? undefined,
       });
       outcome = "success";
     }

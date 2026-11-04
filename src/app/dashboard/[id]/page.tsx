@@ -9,6 +9,7 @@ import { Notice as AnimatedNotice } from "@/components/Notice";
 import { Crown } from "@/components/Crown";
 import { Logo } from "@/components/Logo";
 import { StatsChart } from "@/components/StatsChart";
+import { BadgeCard } from "@/components/BadgeCard";
 import { CountUp } from "@/components/motion/CountUp";
 import { Reveal, Stagger, StaggerItem } from "@/components/motion/Reveal";
 import { ListingFeeForm, TopupForm } from "@/components/WalletPanel";
@@ -17,6 +18,7 @@ import { config, enabledProviders } from "@/lib/config";
 import { orNotFound, requireUserOrRedirect } from "@/lib/guards";
 import { getOwnedBusiness } from "@/lib/listings";
 import { formatINR } from "@/lib/money";
+import { approxUsd, formatUSD, getCurrency } from "@/lib/currency";
 import { zonePrices } from "@/lib/rules";
 import { statsForBusiness } from "@/lib/stats";
 import { getLedger, getWallet } from "@/lib/wallet";
@@ -54,6 +56,8 @@ export default async function ManageBusiness({ params, searchParams }: Props) {
   const others = board.filter((r) => r.businessId !== b.id);
   const mine = board.find((r) => r.businessId === b.id);
   const providers = enabledProviders();
+  const currency = await getCurrency();
+  const feeLabel = currency === "USD" ? formatUSD(config.listingFeeUsdCents) : formatINR(config.listingFeePaise);
   const t = stats.totals;
 
   return (
@@ -85,10 +89,10 @@ export default async function ManageBusiness({ params, searchParams }: Props) {
           <div>
             <h2 className="font-display text-xl font-bold">Pay the listing fee</h2>
             <p className="mt-2 text-muted">
-              The free listing spots are taken. A one-time fee of <strong className="text-ink">{formatINR(config.listingFeePaise)}</strong> sends your listing to review.
+              The free listing spots are taken. A one-time fee of <strong className="text-ink">{feeLabel}</strong> sends your listing to review.
             </p>
           </div>
-          <ListingFeeForm businessId={b.id} providers={providers} feeLabel={formatINR(config.listingFeePaise)} />
+          <ListingFeeForm businessId={b.id} providers={providers} feeLabel={feeLabel} currency={currency} />
         </section>
       )}
 
@@ -139,6 +143,7 @@ export default async function ManageBusiness({ params, searchParams }: Props) {
             zones={zonePrices(others, category.reservePaise)}
             board={board.slice(0, 120).map((r) => ({ id: r.id, position: r.position, amountPaise: r.amountPaise, isYou: r.businessId === b.id }))}
             totalBidders={board.length}
+            usdInrRate={currency === "USD" ? config.usdInrRate : undefined}
           />
         ) : (
           <p className="text-muted">Bidding opens once your listing is approved.</p>
@@ -154,15 +159,17 @@ export default async function ManageBusiness({ params, searchParams }: Props) {
           <div>
             <h2 className="font-display text-xl font-bold">Ad wallet</h2>
             <div className="mt-3 grid grid-cols-2 gap-3">
-              <div><p className="eyebrow">Available</p><p className="mt-1 text-[1.9rem] font-semibold tracking-tight"><CountUp value={wallet.availablePaise / 100} format="inr" /></p></div>
+              <div><p className="eyebrow">Available</p><p className="mt-1 text-[1.9rem] font-semibold tracking-tight"><CountUp value={wallet.availablePaise / 100} format="inr" /></p>{currency === "USD" && wallet.availablePaise > 0 && <p className="text-xs text-muted">{approxUsd(wallet.availablePaise)}</p>}</div>
               <div><p className="eyebrow">Held in bids</p><p className="mt-1 text-[1.9rem] font-semibold tracking-tight text-muted"><CountUp value={wallet.heldPaise / 100} format="inr" /></p></div>
             </div>
           </div>
           {b.status === "APPROVED" || b.status === "PENDING_REVIEW" ? (
-            <TopupForm businessId={b.id} providers={providers} minRupees={config.minTopupPaise / 100} />
+            <TopupForm businessId={b.id} providers={providers} minRupees={config.minTopupPaise / 100} currency={currency} usdInrRate={config.usdInrRate} minUsd={config.minTopupUsdCents / 100} />
           ) : null}
         </section>
       </div>
+
+      {b.status === "APPROVED" && <BadgeCard slug={b.slug} name={b.name} appUrl={config.appUrl} brand={config.appName} />}
 
       <section className="card min-w-0 p-6">
         <h2 className="font-display text-xl font-bold">Wallet history</h2>

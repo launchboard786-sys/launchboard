@@ -4,6 +4,7 @@ import { MockPayButton } from "@/components/MockPayButton";
 import { config } from "@/lib/config";
 import { orNotFound, requireUserOrRedirect } from "@/lib/guards";
 import { formatINR } from "@/lib/money";
+import { formatUSD } from "@/lib/currency";
 import { getPaymentForUser } from "@/lib/payments";
 
 export const dynamic = "force-dynamic";
@@ -21,7 +22,10 @@ export default async function MockPay({ params }: { params: Promise<{ id: string
       <div className="card flex flex-col gap-3 p-6">
         <div className="flex justify-between"><span className="text-muted">For</span><span className="font-semibold">{business.name}</span></div>
         <div className="flex justify-between"><span className="text-muted">Purpose</span><span>{payment.purpose === "LISTING_FEE" ? "Listing fee" : "Ad wallet top-up"}</span></div>
-        <div className="flex justify-between border-t border-line pt-3"><span className="text-muted">Amount</span><span className="font-display text-2xl font-bold">{formatINR(payment.amountPaise)}</span></div>
+        <div className="flex justify-between border-t border-line pt-3"><span className="text-muted">Amount</span><span className="font-display text-2xl font-bold">{payment.currency === "USD" ? formatUSD(payment.chargeMinor ?? 0) : formatINR(payment.amountPaise)}</span></div>
+        {payment.currency === "USD" && payment.purpose === "WALLET_TOPUP" && (
+          <div className="flex justify-between text-sm"><span className="text-muted">Credited to wallet</span><span className="font-mono">{formatINR(payment.amountPaise)}</span></div>
+        )}
         {payment.status === "PAID" ? (
           <p className="rounded-lg bg-good/10 p-3 text-sm text-good">Already paid.</p>
         ) : (

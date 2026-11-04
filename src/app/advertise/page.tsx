@@ -7,12 +7,14 @@ import { Magnetic } from "@/components/motion/Magnetic";
 import { Reveal } from "@/components/motion/Reveal";
 import { listCategories } from "@/lib/listings";
 import { formatINR } from "@/lib/money";
+import { approxUsd, getCurrency } from "@/lib/currency";
 import { biddingWeek, formatWeek } from "@/lib/week";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = { title: "Advertise" };
 
 export default async function AdvertisePage() {
+  const usd = (await getCurrency()) === "USD";
   const cats = await listCategories();
   return (
     <div className="wrap flex max-w-5xl flex-col gap-16 pt-10 sm:gap-24 sm:pt-12">
@@ -64,7 +66,7 @@ export default async function AdvertisePage() {
               {cats.map((c) => (
                 <tr key={c.id} className="border-b border-line transition-colors last:border-0 hover:bg-raised">
                   <td className="px-4 py-3.5 sm:px-5"><Link prefetch={false} href={`/c/${c.slug}`} className="inline-block py-1 font-medium hover:underline hover:underline-offset-4">{c.name}</Link></td>
-                  <td className="whitespace-nowrap px-4 py-3.5 text-right font-mono tabular-nums sm:px-5">{formatINR(c.reservePaise)}</td>
+                  <td className="whitespace-nowrap px-4 py-3.5 text-right font-mono tabular-nums sm:px-5">{formatINR(c.reservePaise)}{usd && <span className="ml-2 text-xs text-muted">{approxUsd(c.reservePaise)}</span>}</td>
                 </tr>
               ))}
             </tbody>

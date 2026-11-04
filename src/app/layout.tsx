@@ -10,6 +10,8 @@ import { MotionProvider } from "@/components/motion/Provider";
 import { InstallPrompt, ServiceWorker } from "@/components/InstallPrompt";
 import { config } from "@/lib/config";
 import { business } from "@/lib/legal";
+import { CurrencySwitch } from "@/components/CurrencySwitch";
+import { getCurrency } from "@/lib/currency";
 
 export const metadata: Metadata = {
   title: { default: `${config.appName}: discover what's launching`, template: `%s · ${config.appName}` },
@@ -29,8 +31,9 @@ export const viewport: Viewport = {
   ],
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const year = new Date().getFullYear();
+  const currency = await getCurrency();
   return (
     <html lang="en" className={`${geist.variable} ${geistMono.variable}`}>
       <body className="flex min-h-screen flex-col">
@@ -65,7 +68,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 </nav>
               </div>
               <div className="flex flex-col gap-3 border-t border-line pt-5 text-xs text-muted sm:flex-row sm:items-center sm:justify-between">
-                <p>© {year} {business.legalName}. {config.appName} is operated by {business.legalName}.</p>
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
+                  <p>© {year} {business.legalName}. {config.appName} is operated by {business.legalName}.</p>
+                  <Suspense><CurrencySwitch current={currency} /></Suspense>
+                </div>
                 <nav aria-label="Legal" className="flex flex-wrap gap-x-4">
                   {[["/terms", "Terms"], ["/privacy", "Privacy"], ["/refunds", "Refunds"], ["/delivery", "Delivery"], ["/contact", "Contact"]].map(([href, label]) => (
                     <Link key={href} prefetch={false} href={href!} className="inline-block py-1.5 transition-colors hover:text-ink">{label}</Link>

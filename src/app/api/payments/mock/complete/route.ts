@@ -19,7 +19,8 @@ export const POST = route(async (req) => {
     provider: "MOCK",
     providerOrderId: payment.providerOrderId,
     providerPaymentId: `mockpay_${Date.now()}`,
-    amountPaise: payment.amountPaise,
+    amountMinor: payment.chargeMinor ?? payment.amountPaise,
+    currency: payment.currency,
   });
   return NextResponse.json({ status: result.status, businessId: payment.businessId, purpose: payment.purpose });
 });

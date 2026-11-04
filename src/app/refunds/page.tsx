@@ -4,6 +4,7 @@ import { LegalPage, OperatorBlock } from "@/components/LegalPage";
 import { config } from "@/lib/config";
 import { business } from "@/lib/legal";
 import { formatINR } from "@/lib/money";
+import { formatUSD } from "@/lib/currency";
 
 export const metadata: Metadata = { title: "Refunds & Cancellations", description: `When and how ${config.appName} refunds payments.` };
 
@@ -21,7 +22,7 @@ export default function Page() {
         { id: "summary", title: "At a glance", body: <table>
           <thead><tr><th>Payment</th><th>Refundable?</th></tr></thead>
           <tbody>
-            <tr><td>Listing fee ({formatINR(config.listingFeePaise)}), listing <strong>rejected</strong> by us</td><td>Yes, in full</td></tr>
+            <tr><td>Listing fee ({formatINR(config.listingFeePaise)} / {formatUSD(config.listingFeeUsdCents)}), listing <strong>rejected</strong> by us</td><td>Yes, in full</td></tr>
             <tr><td>Listing fee, you cancel <strong>before</strong> we review it</td><td>Yes, in full</td></tr>
             <tr><td>Listing fee, listing already <strong>approved</strong></td><td>No. The service has been delivered</td></tr>
             <tr><td>Unused wallet balance (available, not held in a bid)</td><td>Yes, on request</td></tr>
@@ -55,8 +56,9 @@ export default function Page() {
         </ol> },
         { id: "timing", title: "When the money arrives", body: <p>
           Refunds go back to the original payment method (card, UPI, net banking or wallet). After we start the refund, banks usually take 5 to 10
-          working days to show it, depending on your bank and payment method. We don&apos;t charge any fee for refunds. Refunds are made in Indian Rupees;
-          if you paid in another currency, the amount you receive can differ slightly because of your bank&apos;s exchange rate.
+          working days to show it, depending on your bank and payment method. We don&apos;t charge any fee for refunds. Refunds are made in the currency you paid. For US-dollar
+          top-ups we refund the dollar value of the unused balance at the same rate it was credited, so you get back what you put in;
+          your bank&apos;s own exchange fees, if any, are outside our control.
         </p> },
         { id: "contact", title: "Contact", body: <OperatorBlock /> },
       ]}

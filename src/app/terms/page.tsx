@@ -4,6 +4,7 @@ import { LegalPage, OperatorBlock } from "@/components/LegalPage";
 import { config } from "@/lib/config";
 import { business } from "@/lib/legal";
 import { formatINR } from "@/lib/money";
+import { formatUSD } from "@/lib/currency";
 
 export const metadata: Metadata = { title: "Terms of Service", description: `The rules for using ${config.appName}.` };
 
@@ -37,7 +38,7 @@ export default function Page() {
             <li>You may list only a business you own or are authorised to represent.</li>
             <li>Everything in a listing (name, description, links, logo and screenshots) must be accurate, lawful and yours to use.</li>
             <li>The first {config.freeListingLimit.toLocaleString("en-IN")} listings on {b} are free. After that a one-time listing fee of{" "}
-              {formatINR(config.listingFeePaise)} applies, shown before you pay.</li>
+              {formatINR(config.listingFeePaise)} (or {formatUSD(config.listingFeeUsdCents)} when paying in US dollars) applies, shown before you pay.</li>
             <li>We review every listing before it appears publicly, and may reject or remove a listing that breaks these terms. If we reject a
               listing whose fee you paid, we refund the fee as described in the {L("/refunds", "Refund Policy")}.</li>
             <li>Changing an approved listing&apos;s name or website sends it back for a quick review.</li>
@@ -71,12 +72,13 @@ export default function Page() {
           </ul>
         </> },
         { id: "wallet", title: "Wallet and payments", body: <ul>
-          <li>Wallet top-ups are prepaid credit for {b} only. The minimum top-up is {formatINR(config.minTopupPaise)}.
+          <li>Wallet top-ups are prepaid credit for {b} only. The minimum top-up is {formatINR(config.minTopupPaise)} ({formatUSD(config.minTopupUsdCents)} when paying in US dollars).
             Wallet balances earn no interest and cannot be transferred to another business or person.</li>
           <li>Payments are processed by our payment partners (Razorpay, and Stripe for some cards). We never see or store your full card or
             bank details.</li>
-          <li>Prices are in Indian Rupees (₹) and include any applicable taxes unless stated otherwise at checkout. If you pay in another currency,
-            your bank or card issuer sets the exchange rate and may add its own fees.</li>
+          <li>Prices are shown in Indian Rupees (₹) in India and in US dollars (US$) elsewhere, and include any applicable taxes unless stated otherwise
+            at checkout. Wallets and auctions always run in rupees so every bidder competes on the same scale: a US-dollar top-up is credited at the
+            rate shown before you pay (currently US$1 = ₹{config.usdInrRate}), fixed for that payment. Your bank may add its own foreign-transaction fees.</li>
           <li>Refunds of unused balance and listing fees follow the {L("/refunds", "Refund Policy")}.</li>
         </ul> },
         { id: "prohibited", title: "Things you must not do", body: <ul>

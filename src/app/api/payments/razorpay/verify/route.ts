@@ -26,7 +26,8 @@ export const POST = route(async (req) => {
     provider: "RAZORPAY",
     providerOrderId: input.razorpay_order_id,
     providerPaymentId: input.razorpay_payment_id,
-    amountPaise: payment.amountPaise,
+    amountMinor: payment.chargeMinor ?? payment.amountPaise,
+    currency: "INR",
   });
   return NextResponse.json({ status: result.status });
 });

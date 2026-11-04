@@ -11,7 +11,7 @@ export async function POST(req: NextRequest) {
   }
   let event: {
     event?: string;
-    payload?: { order?: { entity?: { id?: string; amount_paid?: number } }; payment?: { entity?: { id?: string } } };
+    payload?: { order?: { entity?: { id?: string; amount_paid?: number; currency?: string } }; payment?: { entity?: { id?: string } } };
   };
   try {
     event = JSON.parse(raw);
@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
   const paymentId = event.payload?.payment?.entity?.id;
   if (!orderId || !paymentId || typeof amount !== "number") return NextResponse.json({ error: "missing fields" }, { status: 400 });
   try {
-    const r = await markPaymentPaid({ provider: "RAZORPAY", providerOrderId: orderId, providerPaymentId: paymentId, amountPaise: amount });
+    const r = await markPaymentPaid({ provider: "RAZORPAY", providerOrderId: orderId, providerPaymentId: paymentId, amountMinor: amount, currency: event.payload?.order?.entity?.currency });
     return NextResponse.json({ status: r.status });
   } catch (e) {
     // 404 = not our order (e.g. another app on the same account): acknowledge so Razorpay stops retrying.

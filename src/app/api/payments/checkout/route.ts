@@ -16,7 +16,9 @@ export const POST = route(async (req) => {
     businessId: input.businessId,
     purpose: input.purpose,
     provider: input.provider,
+    currency: input.currency,
     amountPaise: input.amountRupees != null ? rupeesToPaise(input.amountRupees) : undefined,
+    amountCents: input.amountUsd != null ? Math.round(input.amountUsd * 100) : undefined,
   });
   return NextResponse.json(result);
 });

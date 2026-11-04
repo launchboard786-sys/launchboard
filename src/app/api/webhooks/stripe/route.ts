@@ -22,7 +22,8 @@ export async function POST(req: NextRequest) {
       provider: "STRIPE",
       providerOrderId: session.id,
       providerPaymentId: typeof session.payment_intent === "string" ? session.payment_intent : (session.payment_intent?.id ?? session.id),
-      amountPaise: session.amount_total ?? -1,
+      amountMinor: session.amount_total ?? -1,
+      currency: session.currency ?? undefined,
     });
     return NextResponse.json({ status: r.status });
   } catch (e) {
