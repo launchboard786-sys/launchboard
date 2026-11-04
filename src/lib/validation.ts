@@ -69,6 +69,8 @@ export const checkoutSchema = z.object({
   purpose: z.enum(["WALLET_TOPUP", "LISTING_FEE"]),
   provider: z.enum(["RAZORPAY", "STRIPE", "MOCK"]),
   amountRupees: z.coerce.number().positive().max(5_000_000).optional(),
+  amountUsd: z.coerce.number().positive().max(100_000).optional(),
+  currency: z.enum(["INR", "USD"]).default("INR"),
 });
 
 export const reviewSchema = z.object({

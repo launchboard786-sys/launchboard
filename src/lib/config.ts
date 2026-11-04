@@ -43,6 +43,15 @@ export const config = {
   /** Wallet top-up limits (paise). */
   minTopupPaise: int("MIN_TOPUP_PAISE", 50_000),
   maxTopupPaise: int("MAX_TOPUP_PAISE", 500_000_000),
+  /**
+   * US-dollar pricing for visitors outside India. The auction and wallets stay in rupees (fair, one currency);
+   * USD payments are credited at this fixed rate, locked when checkout starts. ₹ per US$ (whole rupees).
+   */
+  usdInrRate: int("USD_INR_RATE", 85),
+  /** Listing fee for USD payers, in cents. Default $12. */
+  listingFeeUsdCents: int("LISTING_FEE_USD_CENTS", 1200),
+  /** Minimum USD top-up, in cents. Default $10. */
+  minTopupUsdCents: int("MIN_TOPUP_USD_CENTS", 1000),
   /** Auction week timezone: IST, fixed offset, India has no DST. */
   tzOffsetMinutes: 330,
   /** On category pages, one sponsored row after this many organic rows. */

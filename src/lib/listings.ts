@@ -147,6 +147,15 @@ export async function getBusinessBySlug(slug: string) {
   return row ?? null;
 }
 
+/** Position in its category's organic ranking (by votes only; sponsored spots never count). */
+export async function organicRank(b: { categoryId: string; voteCount: number }) {
+  const [row] = await db
+    .select({ n: count() })
+    .from(businesses)
+    .where(and(eq(businesses.categoryId, b.categoryId), eq(businesses.status, "APPROVED"), sql`${businesses.voteCount} > ${b.voteCount}`));
+  return (row?.n ?? 0) + 1;
+}
+
 export async function getOwnedBusiness(ownerId: string, businessId: string) {
   const [row] = await db
     .select({ business: businesses, category: categories })
