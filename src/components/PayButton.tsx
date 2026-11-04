@@ -39,7 +39,7 @@ export function usePay(businessId: string) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  async function pay(params: { provider: Provider; purpose: "WALLET_TOPUP" | "LISTING_FEE"; amountRupees?: number }) {
+  async function pay(params: { provider: Provider; purpose: "WALLET_TOPUP" | "LISTING_FEE"; amountRupees?: number; amountUsd?: number; currency?: "INR" | "USD" }) {
     setBusy(true);
     setError(null);
     try {

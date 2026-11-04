@@ -45,6 +45,8 @@ export function BidPanel(props: {
   zones: Zone[];
   board: BoardRow[];
   totalBidders: number;
+  /** Set for visitors who see US-dollar prices: shows "≈ $" next to rupee amounts. */
+  usdInrRate?: number;
 }) {
   const router = useRouter();
   const { toast } = useToast();
@@ -196,6 +198,9 @@ export function BidPanel(props: {
             </span>
             {projected > 100 ? " (not placed)" : ""}. Holds <strong className="text-ink font-mono">{inr(Math.max(0, delta))}</strong> from your wallet (
             {inr(props.availablePaise)} available).
+            {props.usdInrRate && paise > 0 && (
+              <span className="block text-xs">Your bid is about <strong className="text-ink">${Math.max(1, Math.round(paise / 100 / props.usdInrRate)).toLocaleString("en-US")}</strong> (US$1 = ₹{props.usdInrRate}). Auctions run in rupees for everyone.</span>
+            )}
           </p>
         </div>
 

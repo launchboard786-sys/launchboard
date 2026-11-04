@@ -207,7 +207,7 @@ async function main() {
       .insert(payments)
       .values({ businessId: b.id, provider: "MOCK", purpose: "WALLET_TOPUP", amountPaise: 2_500_000, providerOrderId: `seed_${b.id}` })
       .returning();
-    await markPaymentPaid({ provider: "MOCK", providerOrderId: p!.providerOrderId!, providerPaymentId: `seed_${b.id}`, amountPaise: 2_500_000 });
+    await markPaymentPaid({ provider: "MOCK", providerOrderId: p!.providerOrderId!, providerPaymentId: `seed_${b.id}`, amountMinor: 2_500_000 });
   }
 
   // Current week: bid as if it were last week, then settle, so placements are live now.

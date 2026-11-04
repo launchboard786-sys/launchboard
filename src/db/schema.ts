@@ -230,7 +230,10 @@ export const payments = pgTable(
       .references(() => businesses.id, { onDelete: "cascade" }),
     provider: paymentProviderEnum("provider").notNull(),
     purpose: paymentPurposeEnum("purpose").notNull(),
+    /** Value credited (wallet top-up) or recorded (listing fee), always in INR paise. */
     amountPaise: integer("amount_paise").notNull(),
+    /** What the customer is actually charged, in `currency` minor units (paise or cents). Null on old rows = amountPaise. */
+    chargeMinor: integer("charge_minor"),
     currency: text("currency").notNull().default("INR"),
     status: paymentStatusEnum("status").notNull().default("CREATED"),
     providerOrderId: text("provider_order_id").unique(),
