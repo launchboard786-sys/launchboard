@@ -229,3 +229,5 @@ ALTER TABLE "notifications" ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "users" ALTER COLUMN "password_hash" DROP NOT NULL;
 ALTER TABLE "users" ADD COLUMN "google_sub" text;
 ALTER TABLE "users" ADD CONSTRAINT "users_google_sub_unique" UNIQUE("google_sub");
+-- US-dollar pricing (also shipped as upgrade-5-usd.sql)
+ALTER TABLE "payments" ADD COLUMN IF NOT EXISTS "charge_minor" integer;
