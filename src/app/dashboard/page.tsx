@@ -48,7 +48,20 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
       )}
       <div className="flex flex-wrap items-end justify-between gap-4">
         <PageHeader size="md" kicker={`Hi ${user.name.split(" ")[0]}`} title="Your businesses" />
-        <Magnetic><Link prefetch={false} href="/dashboard/new" className="btn-primary rounded-full px-5 py-2.5">+ Add a business</Link></Magnetic>
+        <div className="flex flex-wrap items-center gap-2">
+          {/* Phones have no header links, so admins reach the review queue from here. */}
+          {user.role === "ADMIN" && (
+            <Link prefetch={false} href="/admin" className="btn-ghost rounded-full px-5 py-2.5 sm:hidden">
+              <svg width="14" height="14" viewBox="0 0 16 16" aria-hidden><path d="M8 1.5 13.5 4v4c0 3.2-2.3 5.6-5.5 6.5C4.8 13.6 2.5 11.2 2.5 8V4z" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" /></svg>
+              Admin
+            </Link>
+          )}
+          <Link prefetch={false} href="/saved" className="btn-ghost rounded-full px-5 py-2.5">
+            <svg width="14" height="14" viewBox="0 0 16 16" aria-hidden><path d="M4 2.5h8a.5.5 0 0 1 .5.5v10.6a.3.3 0 0 1-.48.24L8 10.9l-4.02 2.94a.3.3 0 0 1-.48-.24V3a.5.5 0 0 1 .5-.5z" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" /></svg>
+            Saved
+          </Link>
+          <Magnetic><Link prefetch={false} href="/dashboard/new" className="btn-primary rounded-full px-5 py-2.5">+ Add a business</Link></Magnetic>
+        </div>
       </div>
 
       {rows.length === 0 ? (

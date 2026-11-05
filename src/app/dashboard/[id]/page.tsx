@@ -96,17 +96,18 @@ export default async function ManageBusiness({ params, searchParams }: Props) {
         </section>
       )}
 
-      <Stagger className="grid grid-cols-2 gap-3 md:grid-cols-5">
+      <Stagger className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
         {[
           { k: "This week", node: placement ? <span className={placement.position === 1 ? "gold-text" : ""}>#{placement.position}</span> : <span className="text-muted">Not sponsored</span>, gold: !!placement },
           { k: "Upvotes", node: <CountUp value={b.voteCount} /> },
+          { k: "Saves", node: <CountUp value={b.followerCount} /> },
           { k: "Impressions · 28d", node: <CountUp value={t.sponsoredImpressions} /> },
           { k: "Clicks · 28d", node: <CountUp value={t.websiteClicks} /> },
           { k: "Sponsored CTR", node: t.sponsoredImpressions ? <CountUp value={(t.sponsoredClicks / t.sponsoredImpressions) * 100} format="percent" /> : "–" },
-        ].map((s, i) => (
+        ].map((s) => (
           <StaggerItem
             key={s.k}
-            className={`card group relative min-w-0 overflow-hidden p-4 transition-transform duration-300 hover:-translate-y-0.5 ${i === 4 ? "col-span-2 md:col-span-1" : ""} ${s.gold ? "border-sponsor/30" : ""}`}
+            className={`card group relative min-w-0 overflow-hidden p-4 transition-transform duration-300 hover:-translate-y-0.5 ${s.gold ? "border-sponsor/30" : ""}`}
           >
             {s.gold && <span aria-hidden className="absolute -right-6 -top-6 h-20 w-20 rounded-full bg-gold-hi/25 blur-2xl" />}
             <p className="eyebrow relative truncate">{s.k}</p>

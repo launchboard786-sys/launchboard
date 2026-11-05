@@ -12,6 +12,8 @@ import { Magnetic } from "@/components/motion/Magnetic";
 import { Reveal, Stagger, StaggerItem } from "@/components/motion/Reveal";
 import { VoteButton } from "@/components/VoteButton";
 import { ShareButton } from "@/components/ShareButton";
+import { SaveButton } from "@/components/SaveButton";
+import { isSaved } from "@/lib/follows";
 import { ensureSettled } from "@/lib/auction";
 import { getCurrentUser } from "@/lib/auth";
 import { recordPageView } from "@/lib/impressions";
@@ -47,9 +49,10 @@ export default async function BusinessPage({ params, searchParams }: Props) {
   if (b.status !== "APPROVED" && !isOwner && user?.role !== "ADMIN") notFound();
 
   await ensureSettled();
-  const [[placement], voteRow] = await Promise.all([
+  const [[placement], voteRow, saved] = await Promise.all([
     db.select().from(placements).where(and(eq(placements.businessId, b.id), eq(placements.weekStart, currentWeek()))),
     user ? db.select().from(votes).where(and(eq(votes.userId, user.id), eq(votes.businessId, b.id))) : Promise.resolve([]),
+    isSaved(user?.id, b.id),
   ]);
   if (!isOwner && b.status === "APPROVED") await recordPageView(b.id);
   const fromSponsored = s === "1" && !!placement;
@@ -110,13 +113,16 @@ export default async function BusinessPage({ params, searchParams }: Props) {
                   label={isOwner ? "Share your listing" : "Share"}
                 />
               )}
+              {b.status === "APPROVED" && !isOwner && <SaveButton businessId={b.id} name={b.name} saved={saved} className="hidden sm:inline-flex" />}
               {isOwner && <Link prefetch={false} href={`/dashboard/${b.id}`} className="btn-ghost rounded-full px-5 py-3">Manage listing</Link>}
             </Reveal>
           </div>
           {b.status === "APPROVED" && (
-            <Reveal delay={0.2} className="flex items-center gap-3 self-start sm:flex-col sm:gap-1.5">
+            <Reveal delay={0.2} className="flex w-full items-center gap-3 self-start sm:w-auto sm:flex-col sm:gap-1.5">
               <VoteButton businessId={b.id} count={b.voteCount} voted={voteRow.length > 0} />
               <span className="text-[11px] text-muted">Upvote</span>
+              {/* On phones Save sits here, next to the vote, instead of wrapping onto its own line. */}
+              {!isOwner && <SaveButton businessId={b.id} name={b.name} saved={saved} className="ml-auto sm:hidden" />}
             </Reveal>
           )}
         </header>
@@ -150,6 +156,11 @@ export default async function BusinessPage({ params, searchParams }: Props) {
           <aside className="flex flex-col gap-3 self-start rounded-[16px] border border-line bg-raised p-5 text-sm">
             <p className="font-semibold">Like what {b.name} is building?</p>
             <p className="text-muted">Upvotes push it up the organic ranking, which is never for sale.</p>
+            {b.followerCount > 0 && (
+              <p className="text-muted">
+                <strong className="font-semibold text-ink tabular-nums">{b.followerCount.toLocaleString("en-IN")}</strong> {b.followerCount === 1 ? "person has" : "people have"} saved it.
+              </p>
+            )}
             <Link prefetch={false} href={`/c/${category.slug}`} className="mt-1 inline-block py-1.5 font-medium underline decoration-line underline-offset-4 hover:decoration-ink">More in {category.name} →</Link>
           </aside>
         </Reveal>
