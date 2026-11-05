@@ -62,6 +62,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                 </div>
                 <nav className="grid grid-cols-2 gap-x-12 gap-y-0.5 text-sm">
                   <Link prefetch={false} href="/search" className="inline-block py-1.5 text-muted transition-colors hover:text-ink">Explore</Link>
+                  <Link prefetch={false} href="/hall-of-fame" className="inline-block py-1.5 text-muted transition-colors hover:text-ink">Hall of Fame</Link>
                   <Link prefetch={false} href="/advertise" className="inline-block py-1.5 text-muted transition-colors hover:text-ink">Advertise</Link>
                   <Link prefetch={false} href="/dashboard/new" className="inline-block py-1.5 text-muted transition-colors hover:text-ink">List your startup</Link>
                   <Link prefetch={false} href="/dashboard" className="inline-block py-1.5 text-muted transition-colors hover:text-ink">Dashboard</Link>

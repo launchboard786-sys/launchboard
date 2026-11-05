@@ -5,6 +5,9 @@ import { Hero, type Throne } from "@/components/home/Hero";
 import { Reveal, Stagger, StaggerItem } from "@/components/motion/Reveal";
 import { WeekBoard } from "@/components/WeekBoard";
 import { ensureSettled, getFeaturedAcrossCategories } from "@/lib/auction";
+import { ensureFame, listFameWeeks } from "@/lib/fame";
+import { Crown } from "@/components/Crown";
+import { Logo } from "@/components/Logo";
 import { getCurrentUser } from "@/lib/auth";
 import { config } from "@/lib/config";
 import { categoryCounts, listCategories, listingsUsedCount, listOrganic, votedSet } from "@/lib/listings";
@@ -14,9 +17,9 @@ import { currentWeek, formatWeek } from "@/lib/week";
 export const dynamic = "force-dynamic";
 
 export default async function Home() {
-  await ensureSettled();
+  await Promise.all([ensureSettled(), ensureFame()]);
   const week = currentWeek();
-  const [user, cats, counts, featured, trending, fresh, top, used] = await Promise.all([
+  const [user, cats, counts, featured, trending, fresh, top, used, fame] = await Promise.all([
     getCurrentUser(),
     listCategories(),
     categoryCounts(),
@@ -25,7 +28,9 @@ export default async function Home() {
     listOrganic({ sort: "new", pageSize: 6 }),
     listOrganic({ sort: "top", pageSize: 60 }),
     listingsUsedCount(),
+    listFameWeeks(1),
   ]);
+  const champ = fame[0]?.podium[0];
   await recordSponsoredImpressions(featured.filter((f) => f.position <= 3).map((f) => f.business.id));
   const voted = await votedSet(user?.id, [...trending.items, ...fresh.items].map((i) => i.business.id));
   const freeLeft = Math.max(0, config.freeListingLimit - used);
@@ -78,6 +83,29 @@ export default async function Home() {
             </Reveal>
             <WeekBoard rows={featured} />
           </section>
+        )}
+
+        {champ && (
+          <Reveal as="section" aria-label="Startup of the Week">
+            <Link
+              prefetch={false}
+              href="/hall-of-fame"
+              className="tap-card grain group relative flex flex-col gap-4 overflow-hidden rounded-[20px] bg-[rgb(var(--obsidian))] p-5 text-white sm:flex-row sm:items-center sm:gap-6 sm:p-6"
+            >
+              <span aria-hidden className="absolute -left-10 -top-16 h-48 w-80 rounded-full blur-[70px]" style={{ background: "radial-gradient(closest-side, rgb(var(--gold-hi) / 0.3), transparent)" }} />
+              <span className="relative z-[2] flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-gold-hi sm:w-44 sm:shrink-0 sm:flex-col sm:items-start">
+                <Crown size={18} /> Startup of the Week
+              </span>
+              <span className="relative z-[2] flex min-w-0 flex-1 items-center gap-4">
+                <Logo name={champ.business.name} url={champ.business.logoUrl} size={52} />
+                <span className="min-w-0">
+                  <span className="block truncate text-xl font-semibold tracking-tight">{champ.business.name}</span>
+                  <span className="block truncate text-sm text-white/60">{champ.business.tagline}</span>
+                </span>
+              </span>
+              <span className="relative z-[2] text-sm font-medium text-white/70 transition-colors group-hover:text-white">Hall of Fame →</span>
+            </Link>
+          </Reveal>
         )}
 
         <section aria-labelledby="how-h" className="relative">

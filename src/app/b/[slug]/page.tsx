@@ -14,11 +14,12 @@ import { VoteButton } from "@/components/VoteButton";
 import { ShareButton } from "@/components/ShareButton";
 import { SaveButton } from "@/components/SaveButton";
 import { isSaved } from "@/lib/follows";
+import { ensureFame, winsFor } from "@/lib/fame";
 import { ensureSettled } from "@/lib/auction";
 import { getCurrentUser } from "@/lib/auth";
 import { recordPageView } from "@/lib/impressions";
 import { getBusinessBySlug } from "@/lib/listings";
-import { currentWeek } from "@/lib/week";
+import { currentWeek, formatWeek } from "@/lib/week";
 import { config } from "@/lib/config";
 
 export const dynamic = "force-dynamic";
@@ -48,11 +49,12 @@ export default async function BusinessPage({ params, searchParams }: Props) {
   // Unapproved listings are visible only to their owner (preview) and admins.
   if (b.status !== "APPROVED" && !isOwner && user?.role !== "ADMIN") notFound();
 
-  await ensureSettled();
-  const [[placement], voteRow, saved] = await Promise.all([
+  await Promise.all([ensureSettled(), ensureFame()]);
+  const [[placement], voteRow, saved, wins] = await Promise.all([
     db.select().from(placements).where(and(eq(placements.businessId, b.id), eq(placements.weekStart, currentWeek()))),
     user ? db.select().from(votes).where(and(eq(votes.userId, user.id), eq(votes.businessId, b.id))) : Promise.resolve([]),
     isSaved(user?.id, b.id),
+    winsFor(b.id),
   ]);
   if (!isOwner && b.status === "APPROVED") await recordPageView(b.id);
   const fromSponsored = s === "1" && !!placement;
@@ -89,6 +91,16 @@ export default async function BusinessPage({ params, searchParams }: Props) {
           <div className="min-w-0 flex-1">
             <Reveal delay={0.05} className="flex flex-wrap items-center gap-3">
               <h1 className="text-[clamp(2.2rem,5vw,3.6rem)] font-semibold leading-none tracking-[-0.04em]">{b.name}</h1>
+              {wins[0] && (
+                <Link
+                  prefetch={false}
+                  href="/hall-of-fame"
+                  title={wins.map((w) => formatWeek(w)).join("\n")}
+                  className="flex items-center gap-1.5 rounded-full bg-[rgb(var(--obsidian))] px-2.5 py-1 text-xs font-semibold text-gold-hi transition-opacity hover:opacity-90"
+                >
+                  <Crown size={13} /> {wins.length > 1 ? `${wins.length}× Startup of the Week` : `Startup of the Week · ${formatWeek(wins[0])}`}
+                </Link>
+              )}
               {placement && (
                 <span className="flex items-center gap-1.5 rounded-full border border-sponsor/30 bg-sponsor-soft px-2.5 py-1 text-xs font-semibold text-sponsor">
                   <Crown size={13} /> Sponsored · #{placement.position} this week

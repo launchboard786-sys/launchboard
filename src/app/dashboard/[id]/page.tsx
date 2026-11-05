@@ -10,6 +10,7 @@ import { Crown } from "@/components/Crown";
 import { Logo } from "@/components/Logo";
 import { StatsChart } from "@/components/StatsChart";
 import { BadgeCard } from "@/components/BadgeCard";
+import { winsFor } from "@/lib/fame";
 import { CountUp } from "@/components/motion/CountUp";
 import { Reveal, Stagger, StaggerItem } from "@/components/motion/Reveal";
 import { ListingFeeForm, TopupForm } from "@/components/WalletPanel";
@@ -170,7 +171,7 @@ export default async function ManageBusiness({ params, searchParams }: Props) {
         </section>
       </div>
 
-      {b.status === "APPROVED" && <BadgeCard slug={b.slug} name={b.name} appUrl={config.appUrl} brand={config.appName} />}
+      {b.status === "APPROVED" && <BadgeCard slug={b.slug} name={b.name} appUrl={config.appUrl} brand={config.appName} won={(await winsFor(b.id)).length > 0} />}
 
       <section className="card min-w-0 p-6">
         <h2 className="font-display text-xl font-bold">Wallet history</h2>
