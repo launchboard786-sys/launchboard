@@ -27,7 +27,7 @@ export function NavBar({ appName, user }: { appName: string; user: User }) {
     { href: "/search", label: "Explore" },
     { href: "/advertise", label: "Advertise" },
     ...(user?.role === "ADMIN" ? [{ href: "/admin", label: "Admin" }] : []),
-    ...(user ? [{ href: "/dashboard", label: "Dashboard" }] : []),
+    ...(user ? [{ href: "/saved", label: "Saved" }, { href: "/dashboard", label: "Dashboard" }] : []),
   ];
 
   async function logout() {
@@ -142,7 +142,7 @@ function BottomNav({ pathname, signedIn }: { pathname: string; signedIn: boolean
     >
       <ul className="grid grid-cols-4">
         {tabs.map((t) => {
-          const active = isActive(pathname, t.href) || (t.href === "/login" && pathname === "/signup");
+          const active = isActive(pathname, t.href) || (t.href === "/login" && pathname === "/signup") || (t.href === "/dashboard" && pathname === "/saved");
           return (
             <li key={t.label}>
               <Link prefetch={false} href={t.href} className={`relative flex flex-col items-center gap-0.5 py-2.5 text-[11px] font-medium ${active ? "text-ink" : "text-muted"}`} aria-current={active ? "page" : undefined}>

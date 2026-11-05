@@ -111,6 +111,8 @@ export const businesses = pgTable(
     status: listingStatusEnum("status").notNull(),
     rejectionReason: text("rejection_reason"),
     voteCount: integer("vote_count").notNull().default(0),
+    /** How many people saved (follow) this listing. Kept in step with the follows table. */
+    followerCount: integer("follower_count").notNull().default(0),
     approvedAt: timestamp("approved_at", { withTimezone: true }),
     createdAt: createdAt(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
@@ -134,6 +136,21 @@ export const votes = pgTable(
     createdAt: createdAt(),
   },
   (t) => [primaryKey({ columns: [t.userId, t.businessId] }), index("votes_business_idx").on(t.businessId)],
+);
+
+/** A person saved (follows) a startup. Shown in their Saved list; the count is social proof for the founder. */
+export const follows = pgTable(
+  "follows",
+  {
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    businessId: text("business_id")
+      .notNull()
+      .references(() => businesses.id, { onDelete: "cascade" }),
+    createdAt: createdAt(),
+  },
+  (t) => [primaryKey({ columns: [t.userId, t.businessId] }), index("follows_business_idx").on(t.businessId), index("follows_user_created_idx").on(t.userId, t.createdAt)],
 );
 
 export const wallets = pgTable("wallets", {
