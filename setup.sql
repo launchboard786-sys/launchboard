@@ -231,3 +231,15 @@ ALTER TABLE "users" ADD COLUMN "google_sub" text;
 ALTER TABLE "users" ADD CONSTRAINT "users_google_sub_unique" UNIQUE("google_sub");
 -- US-dollar pricing (also shipped as upgrade-5-usd.sql)
 ALTER TABLE "payments" ADD COLUMN IF NOT EXISTS "charge_minor" integer;
+
+-- Save / follow startups (also shipped as upgrade-6-follows.sql)
+CREATE TABLE IF NOT EXISTS "follows" (
+	"user_id" text NOT NULL REFERENCES "public"."users"("id") ON DELETE cascade,
+	"business_id" text NOT NULL REFERENCES "public"."businesses"("id") ON DELETE cascade,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
+	CONSTRAINT "follows_user_id_business_id_pk" PRIMARY KEY("user_id","business_id")
+);
+ALTER TABLE "businesses" ADD COLUMN IF NOT EXISTS "follower_count" integer DEFAULT 0 NOT NULL;
+CREATE INDEX IF NOT EXISTS "follows_business_idx" ON "follows" USING btree ("business_id");
+CREATE INDEX IF NOT EXISTS "follows_user_created_idx" ON "follows" USING btree ("user_id","created_at");
+ALTER TABLE "follows" ENABLE ROW LEVEL SECURITY;
