@@ -25,6 +25,7 @@ export function NavBar({ appName, user }: { appName: string; user: User }) {
 
   const links = [
     { href: "/search", label: "Explore" },
+    { href: "/hall-of-fame", label: "Hall of Fame" },
     { href: "/advertise", label: "Advertise" },
     ...(user?.role === "ADMIN" ? [{ href: "/admin", label: "Admin" }] : []),
     ...(user ? [{ href: "/saved", label: "Saved" }, { href: "/dashboard", label: "Dashboard" }] : []),

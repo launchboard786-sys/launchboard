@@ -4,17 +4,17 @@ import { useState } from "react";
 import { useToast } from "./motion/Toast";
 
 type Theme = "dark" | "light";
-type Style = "rank" | "votes";
+type Style = "rank" | "votes" | "week";
 
 /** Dashboard: pick a badge look, preview it live, copy the embed code. */
-export function BadgeCard({ slug, name, appUrl, brand }: { slug: string; name: string; appUrl: string; brand: string }) {
+export function BadgeCard({ slug, name, appUrl, brand, won = false }: { slug: string; name: string; appUrl: string; brand: string; won?: boolean }) {
   const [theme, setTheme] = useState<Theme>("dark");
-  const [style, setStyle] = useState<Style>("rank");
+  const [style, setStyle] = useState<Style>(won ? "week" : "rank");
   const [fmt, setFmt] = useState<"html" | "md">("html");
   const { toast } = useToast();
   const img = `${appUrl}/badge/${slug}.svg?theme=${theme}&style=${style}`;
   const link = `${appUrl}/b/${slug}?ref=badge`;
-  const alt = `${name.replace(/["<>]/g, "")}: featured on ${brand}`;
+  const alt = style === "week" ? `${name.replace(/["<>]/g, "")}: Startup of the Week on ${brand}` : `${name.replace(/["<>]/g, "")}: featured on ${brand}`;
   const code = fmt === "html"
     ? `<a href="${link}" target="_blank" rel="noopener"><img src="${img}" alt="${alt}" width="250" height="54"></a>`
     : `[![${alt}](${img})](${link})`;
@@ -40,7 +40,7 @@ export function BadgeCard({ slug, name, appUrl, brand }: { slug: string; name: s
       </div>
       <div className="flex flex-wrap gap-2">
         <Seg label="Badge colour" value={theme} set={setTheme} options={[["dark", "Dark"], ["light", "Light"]]} />
-        <Seg label="Badge shows" value={style} set={setStyle} options={[["rank", "Rank"], ["votes", "Upvotes"]]} />
+        <Seg label="Badge shows" value={style} set={setStyle} options={won ? [["week", "Startup of the Week"], ["rank", "Rank"], ["votes", "Upvotes"]] : [["rank", "Rank"], ["votes", "Upvotes"]]} />
       </div>
       <div className={`grid place-items-center rounded-[14px] border border-line p-6 ${theme === "dark" ? "bg-[#f4f2ec]" : "bg-[#1a1a1d]"}`}>
         <img src={`/badge/${slug}.svg?theme=${theme}&style=${style}`} alt="Badge preview" width={250} height={54} />

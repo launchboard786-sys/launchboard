@@ -153,6 +153,28 @@ export const follows = pgTable(
   (t) => [primaryKey({ columns: [t.userId, t.businessId] }), index("follows_business_idx").on(t.businessId), index("follows_user_created_idx").on(t.userId, t.createdAt)],
 );
 
+/**
+ * Hall of Fame: the top 3 startups by upvotes received in each finished week (Monday–Sunday IST).
+ * Written once when the week ends and never changed, so history stays put.
+ */
+export const fameWeeks = pgTable(
+  "fame_weeks",
+  {
+    weekStart: timestamp("week_start", { withTimezone: true }).notNull(),
+    position: integer("position").notNull(),
+    businessId: text("business_id")
+      .notNull()
+      .references(() => businesses.id, { onDelete: "cascade" }),
+    weekVotes: integer("week_votes").notNull(),
+    createdAt: createdAt(),
+  },
+  (t) => [
+    primaryKey({ columns: [t.weekStart, t.position] }),
+    index("fame_weeks_business_idx").on(t.businessId),
+    check("fame_weeks_position", sql`${t.position} between 1 and 3`),
+  ],
+);
+
 export const wallets = pgTable("wallets", {
   id: id(),
   businessId: text("business_id")
@@ -313,3 +335,4 @@ export type Bid = typeof bids.$inferSelect;
 export type Placement = typeof placements.$inferSelect;
 export type Payment = typeof payments.$inferSelect;
 export type Wallet = typeof wallets.$inferSelect;
+export type FameWeek = typeof fameWeeks.$inferSelect;

@@ -191,11 +191,15 @@ async function main() {
   console.log(`Businesses: ${created.length} live + 2 in review`);
 
   // Votes: skewed so some clearly trend.
-  const voteRows: { userId: string; businessId: string }[] = [];
+  // Spread over the last five weeks so the Hall of Fame has past Startups of the Week.
+  // Dates use their own random sequence so the rest of the demo data (bids, stats) stays the same.
+  const when = rng(7);
+  const voteRows: { userId: string; businessId: string; createdAt: Date }[] = [];
   for (const b of created) {
     const n = Math.floor(Math.pow(rand(), 2) * voters.length);
     const shuffled = [...voters].sort(() => rand() - 0.5).slice(0, n);
-    for (const v of shuffled) voteRows.push({ userId: v.id, businessId: b.id });
+    const lean = when(); // some startups got most of their votes recently, others early on
+    for (const v of shuffled) voteRows.push({ userId: v.id, businessId: b.id, createdAt: new Date(Date.now() - Math.pow(when(), 0.5 + lean * 2) * 35 * 86400_000) });
   }
   for (let i = 0; i < voteRows.length; i += 1000) await db.insert(votes).values(voteRows.slice(i, i + 1000));
   await db.execute(sql`update businesses b set vote_count = (select count(*) from votes v where v.business_id = b.id)`);
